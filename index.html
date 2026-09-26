@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Дмитрий (Burger) — 3D Вертолётное Портфолио | Lead Designer & Product Lead</title>
+  <meta name="description" content="Интерактивное 3D-портфолио Дмитрия (Burger). Полетайте на вертолёте по площадкам реальных проектов, исследуйте кейсы и собирайте звёзды!">
+  <link rel="icon" href="./assets/images/Burgerlogo.jpg" type="image/jpeg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./src/style.css">
+</head>
+<body>
+
+  <!-- 3D Three.js WebGL Viewport -->
+  <div id="canvas-container"></div>
+
+  <!-- Interactive 2D UI Overlay -->
+  <div class="ui-overlay">
+    
+    <!-- TOP BAR -->
+    <header class="top-bar">
+      <!-- Left: Profile Pill -->
+      <div class="profile-pill">
+        <div class="avatar-wrapper">
+          <img src="./assets/images/Burgerlogo.jpg" alt="Дмитрий Burger" class="avatar" />
+          <span class="online-dot" title="Открыт к проектам"></span>
+        </div>
+        <div class="profile-info">
+          <span class="profile-name">Дмитрий (Burger)</span>
+          <span class="profile-role">Lead Designer &amp; Product Lead</span>
+        </div>
+      </div>
+
+      <!-- Center: Flight Status HUD -->
+      <div class="hud-center">
+        <div class="status-badge status-badge--autopilot" id="flight-mode-badge">
+          <span class="pulse-dot"></span> 🚁 Автопилот
+        </div>
+        <div class="hud-location-tag" id="hud-pad-name">
+          🚁 Главная База
+        </div>
+      </div>
+
+      <!-- Right: Action Buttons -->
+      <div class="top-actions">
+        <div class="hud-stars" id="stars-count" title="Соберите все звёздочки на островах!">
+          ⭐ 0 / 10
+        </div>
+
+        <button class="hud-btn" id="btn-camera" title="Сменить вид камеры (Клавиша C)">
+          🎥 <span class="btn-text">Следование</span>
+        </button>
+
+        <button class="hud-btn" id="btn-mute" title="Включить / Выключить звук (Клавиша M)">
+          🔊 <span class="btn-text">Звук: Вкл</span>
+        </button>
+
+        <a href="https://t.me/aimovl" target="_blank" rel="noopener noreferrer" class="hud-btn hud-btn--cta" title="Написать Дмитрию в Telegram">
+          ✉ <span class="btn-text">Telegram</span>
+        </a>
+
+        <button class="hud-btn" id="btn-help" title="Управление и подсказки">
+          ❓
+        </button>
+      </div>
+    </header>
+
+    <!-- PROXIMITY PROMPT (Appears when hovering low near a helipad in manual flight) -->
+    <div class="proximity-prompt" id="proximity-prompt"></div>
+
+    <!-- TOUCH CONTROLS (Appears on mobile screens) -->
+    <div class="touch-controls" id="touch-controls">
+      <div class="joystick-container" id="joystick-container">
+        <div class="joystick-stick" id="joystick-stick"></div>
+      </div>
+      <div class="touch-buttons">
+        <button class="touch-btn" id="btn-touch-up" aria-label="Взлёт / Подъём">▲</button>
+        <button class="touch-btn" id="btn-touch-down" aria-label="Снижение / Посадка">▼</button>
+      </div>
+    </div>
+
+    <!-- BOTTOM NAVIGATION DOCK -->
+    <footer class="bottom-dock">
+      <div class="dock-controls-hint">
+        🎮 <strong>Управление:</strong> Кликайте по станциям для автопилота или используйте <span class="key-badge">W</span> <span class="key-badge">A</span> <span class="key-badge">S</span> <span class="key-badge">D</span> / Стрелочки для свободного полёта
+      </div>
+
+      <div class="dock-container">
+        <button class="dock-nav-arrow" id="btn-prev-pad" aria-label="Предыдущий проект" title="Предыдущая площадка">◀</button>
+        
+        <div class="ribbon-scroll" id="ribbon-buttons">
+          <!-- Dynamically populated from data.js -->
+        </div>
+
+        <button class="dock-nav-arrow" id="btn-next-pad" aria-label="Следующий проект" title="Следующая площадка">▶</button>
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- MODERN PROJECT MODAL DIALOG -->
+  <dialog id="project-modal">
+    <div class="modal-card" id="modal-card-content">
+      <!-- Populated dynamically by UI.js -->
+    </div>
+  </dialog>
+
+  <!-- HELP & CONTROLS MODAL DIALOG -->
+  <dialog id="help-modal">
+    <div class="help-card">
+      <div class="help-header">
+        <h3>🚁 Как исследовать портфолио</h3>
+        <button class="modal-close-btn" onclick="document.getElementById('help-modal').close()">✕</button>
+      </div>
+
+      <div class="help-grid">
+        <div class="help-item">
+          <div class="help-icon">📍</div>
+          <div>
+            <h4>Автопилот (Маршруты)</h4>
+            <p>Нажимайте на любые кнопки проектов в нижней панели. Вертолёт самостоятельно взлетит, долетит по дуге до нужной площадки и откроет карточку с описанием и ссылкой на проект.</p>
+          </div>
+        </div>
+
+        <div class="help-item">
+          <div class="help-icon">🕹️</div>
+          <div>
+            <h4>Свободный полёт (Ручной режим)</h4>
+            <p>В любой момент используйте клавиши <span class="key-badge">W</span> <span class="key-badge">A</span> <span class="key-badge">S</span> <span class="key-badge">D</span> или стрелочки. <span class="key-badge">Space</span> — подъём, <span class="key-badge">Shift</span> — ускорение, <span class="key-badge">C</span> — переключение камеры (слежение, изометрия, вид из кабины).</p>
+          </div>
+        </div>
+
+        <div class="help-item">
+          <div class="help-icon">⭐</div>
+          <div>
+            <h4>Сбор звёздочек</h4>
+            <p>На островах и между мостами спрятано 10 золотых звёзд. Попробуйте найти и собрать их все в ручном режиме полёта!</p>
+          </div>
+        </div>
+
+        <div class="help-item">
+          <div class="help-icon">📬</div>
+          <div>
+            <h4>Связь с Дмитрием</h4>
+            <p>Готовы обсудить проект или сотрудничество? Нажмите кнопку <strong>Telegram</strong> вверху или напишите напрямую: <a href="https://t.me/aimovl" target="_blank" style="color: var(--accent-cyan);">@aimovl</a>.</p>
+          </div>
+        </div>
+      </div>
+
+      <div style="text-align: center; margin-top: 10px;">
+        <button class="btn btn--primary" onclick="document.getElementById('help-modal').close()" style="background: var(--accent-cyan); width: 100%;">
+          Понятно, полетели! 🚀
+        </button>
+      </div>
+    </div>
+  </dialog>
+
+  <script type="module" src="./src/main.js"></script>
+</body>
+</html>

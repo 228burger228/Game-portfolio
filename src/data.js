@@ -1,0 +1,233 @@
+export const PORTFOLIO_INFO = {
+  author: "Дмитрий (Burger)",
+  role: "Lead Designer & Product Lead",
+  status: "Available for Projects",
+  telegram: "https://t.me/aimovl",
+  github: "https://github.com/228burger228",
+  avatar: "./assets/images/Burgerlogo.jpg",
+  tagline: "Design-Driven Product & Technical Studio · 15+ проектов в проде"
+};
+
+export const HELIPADS = [
+  {
+    id: "hq",
+    number: "0",
+    name: "Главная База",
+    shortTitle: "База Дмитрия",
+    category: "Старт / Обо мне",
+    badge: "HQ",
+    color: "#6366f1",
+    accentGlow: 0x6366f1,
+    position: { x: 0, y: 0.5, z: 0 },
+    cameraOffset: { x: 0, y: 16, z: 24 },
+    emoji: "🚁",
+    title: "Дмитрий (Burger) — Lead Designer & Product Lead",
+    subtitle: "Создаю цифровые продукты от концепта до production",
+    description: "Координирую дизайнеров, разработчиков и стейкхолдеров. Превращаю хаос в продуманные цифровые системы и сильный UX. В портфолио — 15+ проектов в проде, государственные платформы, коммерческий e-commerce, мобильные сервисы и игровое комьюнити.",
+    tags: ["Product Design", "Design Systems", "Team Lead", "UX Research", "Figma", "Web Architecture"],
+    stats: [
+      { label: "Проектов в проде", value: "15+" },
+      { label: "Lighthouse Score", value: "95+" },
+      { label: "Опыт", value: "Design & Tech" }
+    ],
+    linkText: "Написать в Telegram",
+    link: "https://t.me/aimovl",
+    secondaryLinkText: "GitHub профиль",
+    secondaryLink: "https://github.com/228burger228",
+    image: "./assets/images/Burgerlogo.jpg"
+  },
+  {
+    id: "masterscity",
+    number: "1",
+    name: "Город Мастеров",
+    shortTitle: "Город Мастеров",
+    category: "Game / EdTech",
+    badge: "Гос. проект",
+    color: "#4f46e5",
+    accentGlow: 0x4f46e5,
+    position: { x: -38, y: 0.5, z: -32 },
+    cameraOffset: { x: -38, y: 16, z: -8 },
+    emoji: "🏛️",
+    title: "Город Мастеров — Образовательная игровая платформа",
+    subtitle: "Проект для Департамента образования Москвы",
+    description: "Комплексная образовательно-игровая платформа. Верстал макет и писал весь фронтенд-код — от концептуального дизайна до финального деплоя. Реализовал систему авторизации, профили пользователей, трекинг игровых достижений, кастомную темную тему, смену шрифтов для доступности и интерактивную канбан-доску.",
+    tags: ["HTML5/JS", "Figma", "Gamification", "Dark Theme", "Kanban", "State Management", "EdTech"],
+    stats: [
+      { label: "Клиент", value: "ДепОбр Москвы" },
+      { label: "Роль", value: "Design + Dev" },
+      { label: "Статус", value: "В проде" }
+    ],
+    linkText: "Открыть платформу",
+    link: "https://masterscitygame.ru",
+    image: "./assets/Porfolscr.png"
+  },
+  {
+    id: "hgstroy",
+    number: "2",
+    name: "HgStroy",
+    shortTitle: "HgStroy",
+    category: "Corporate / Web",
+    badge: "Корпоративный портал",
+    color: "#f97316",
+    accentGlow: 0xf97316,
+    position: { x: 38, y: 0.5, z: -35 },
+    cameraOffset: { x: 38, y: 16, z: -11 },
+    emoji: "🏗️",
+    title: "HgStroy — Комплексный сайт строительной компании",
+    subtitle: "Полный редизайн, архитектура и фронтенд для компании «Хаус Гард»",
+    description: "Разработка многоуровневого портала строительной компании. Проработал модульную архитектуру шапки для всей сети подсайтов, сквозной адаптивный дизайн, карусели реализованных объектов, конверсионные формы захвата и интеграцию с CRM. Подготовил техническую документацию для миграции на Next.js.",
+    tags: ["UI/UX", "Design System", "Bootstrap 5", "CRM Integration", "Swiper", "Responsive"],
+    stats: [
+      { label: "Компания", value: "HgStroy" },
+      { label: "Формат", value: "Multi-page" },
+      { label: "Конверсия", value: "+38%" }
+    ],
+    linkText: "Смотреть сайт HgStroy",
+    link: "https://smr.hgstroy.ru/index.html",
+    image: "./assets/images/hgstroyblag.png"
+  },
+  {
+    id: "warpath",
+    number: "3",
+    name: "Warpath Wiki",
+    shortTitle: "Warpath Wiki",
+    category: "Gaming / Community",
+    badge: "Официальное партнёрство",
+    color: "#ef4444",
+    accentGlow: 0xef4444,
+    position: { x: 45, y: 0.5, z: 28 },
+    cameraOffset: { x: 45, y: 16, z: 52 },
+    emoji: "⚔️",
+    title: "Warpath: Ace Shooter Wiki",
+    subtitle: "Главная база знаний для русскоязычного комьюнити мобильной стратегии",
+    description: "Интерактивный справочник в официальном партнерстве с разработчиками игры. База охватывает полную базу юнитов, офицеров, экипировки, расчеты урона и механики боев. Закрывает информационную нишу для сотен тысяч игроков, которую не покрывают англоязычные и китайские ресурсы.",
+    tags: ["Vue 3", "Vite", "Design System", "Gaming UI", "Data Architecture", "GitHub Pages"],
+    stats: [
+      { label: "Партнёр", value: "Warpath" },
+      { label: "Технологии", value: "Vue 3 + Vite" },
+      { label: "Аудитория", value: "RU Community" }
+    ],
+    linkText: "Перейти в Wiki",
+    link: "https://228burger228.github.io/WarpathYTwiki/index.html",
+    image: "./assets/warpathwikiscrin.png"
+  },
+  {
+    id: "ecostep",
+    number: "4",
+    name: "Eco-Step",
+    shortTitle: "Eco-Step App",
+    category: "Mobile UI / Concept",
+    badge: "App Design",
+    color: "#10b981",
+    accentGlow: 0x10b981,
+    position: { x: -42, y: 0.5, z: 32 },
+    cameraOffset: { x: -42, y: 16, z: 56 },
+    emoji: "🌱",
+    title: "Eco-Step — Мобильное приложение для эко-транспорта",
+    subtitle: "Экосистема для велосипедистов и пользователей микромобильности",
+    description: "Интерфейс мобильного приложения: умная прокладка безопасных веломаршрутов, GPS-трекинг, учет сэкономленных выбросов CO2, геймифицированная система наград и социальное комьюнити единомышленников.",
+    tags: ["Mobile UI", "Figma", "iOS Guidelines", "Gamification", "App Architecture"],
+    stats: [
+      { label: "Тип", value: "Mobile Concept" },
+      { label: "Инструмент", value: "Figma" },
+      { label: "Стиль", value: "Clean Green" }
+    ],
+    linkText: "Открыть макет в Figma",
+    link: "https://www.figma.com/design/2u0JYeK7QvPeYxCvcYyHtL/ecostep",
+    image: "./assets/ecostep.png"
+  },
+  {
+    id: "docfrost",
+    number: "5",
+    name: "docFrost",
+    shortTitle: "docFrost",
+    category: "Landing / Lead Gen",
+    badge: "High Conversion",
+    color: "#06b6d4",
+    accentGlow: 0x06b6d4,
+    position: { x: -5, y: 0.5, z: -58 },
+    cameraOffset: { x: -5, y: 16, z: -34 },
+    emoji: "❄️",
+    title: "docFrost — Сервис вызова мастера и подбора запчастей",
+    subtitle: "Лидогенерирующий лендинг с высокой конверсией",
+    description: "Продуманная посадочная страница с калькулятором стоимости ремонта, системой быстрого вызова мастера и модулем заказа деталей. Структура выстроена на психологических триггерах доверия, что позволило кратно увеличить конверсию из клика в звонок.",
+    tags: ["Lead Magnet", "High Conversion", "UX Copywriting", "HTML/CSS/JS", "Mobile-First"],
+    stats: [
+      { label: "Тип", value: "Landing Page" },
+      { label: "Фокус", value: "Лидогенерация" },
+      { label: "Результат", value: "Высокий CTR" }
+    ],
+    linkText: "Посмотреть сайт",
+    link: "https://228burger228.github.io/docFrost/",
+    image: "./assets/frosTscrin.png"
+  },
+  {
+    id: "skills",
+    number: "6",
+    name: "Навыки & Стек",
+    shortTitle: "Навыки & Стек",
+    category: "Компетенции",
+    badge: "Skills & Tech",
+    color: "#a855f7",
+    accentGlow: 0xa855f7,
+    position: { x: -26, y: 0.5, z: 65 },
+    cameraOffset: { x: -26, y: 16, z: 89 },
+    emoji: "🛠️",
+    title: "Компетенции и профессиональный стек",
+    subtitle: "Гармоничное сочетание продуктового дизайна и технической экспертизы",
+    description: "Управляю полным жизненным циклом продукта. Говорю на одном языке как с бизнесом, так и с разработчиками. Могу спроектировать дизайн-систему в Figma, запрограммировать интерактивный фронтенд и довести решение до продакшена.",
+    tags: [
+      "Figma & Tokens", "UI/UX Architecture", "Product Leadership", "Design Systems",
+      "HTML5 / Modern CSS", "JavaScript / ESNext", "Vue.js & Vite", "Three.js / WebGL",
+      "Telegram Mini Apps", "Bootstrap & Tailwind", "Git / GitHub Pages", "CGI / 3D Basics"
+    ],
+    stats: [
+      { label: "Дизайн", value: "Figma Pro" },
+      { label: "Разработка", value: "Frontend" },
+      { label: "Продукт", value: "End-to-End" }
+    ],
+    linkText: "Написать Дмитрию",
+    link: "https://t.me/aimovl",
+    image: "./assets/midquest.png"
+  },
+  {
+    id: "contacts",
+    number: "7",
+    name: "Контакты",
+    shortTitle: "Контакты",
+    category: "Связь",
+    badge: "Contact Me",
+    color: "#ec4899",
+    accentGlow: 0xec4899,
+    position: { x: 30, y: 0.5, z: 68 },
+    cameraOffset: { x: 30, y: 16, z: 92 },
+    emoji: "📬",
+    title: "Давайте создадим что-то выдающееся вместе!",
+    subtitle: "Открыт для интересных продуктов, дизайн-лидерства и веб-разработки",
+    description: "Ищете сильного Lead дизайнера, продуктового специалиста или разработчика, способного создать эстетичный, быстрый и работающий продукт? Напишите мне в Telegram или загляните на GitHub — обсудим вашу задачу!",
+    tags: ["Telegram @aimovl", "GitHub 228burger228", "Full-Cycle Product", "Design Lead"],
+    stats: [
+      { label: "Telegram", value: "@aimovl" },
+      { label: "Ответ", value: "В течение часа" },
+      { label: "Локация", value: "Москва / Remote" }
+    ],
+    linkText: "Написать в Telegram (@aimovl)",
+    link: "https://t.me/aimovl",
+    secondaryLinkText: "GitHub репозитории",
+    secondaryLink: "https://github.com/228burger228",
+    image: "./assets/images/Burgerlogo.jpg"
+  }
+];
+
+export const COLLECTIBLE_STARS = [
+  { id: 1, x: -18, y: 2.2, z: -15 },
+  { id: 2, x: 18, y: 2.5, z: -18 },
+  { id: 3, x: 22, y: 3.0, z: -50 },
+  { id: 4, x: -20, y: 2.0, z: -48 },
+  { id: 5, x: 25, y: 2.8, z: 2 },
+  { id: 6, x: -22, y: 2.2, z: 12 },
+  { id: 7, x: 12, y: 2.5, z: 46 },
+  { id: 8, x: -6, y: 3.2, z: 38 },
+  { id: 9, x: 42, y: 2.2, z: -2 },
+  { id: 10, x: 3, y: 4.0, z: 80 }
+];
