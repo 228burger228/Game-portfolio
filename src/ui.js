@@ -2,13 +2,14 @@ import { HELIPADS } from './data.js';
 import { sound } from './audio.js';
 
 export class UI {
-  constructor({ onSelectPad, onNextPad, onPrevPad, onToggleCamera, onToggleMute, onToggleTheme }) {
+  constructor({ onSelectPad, onNextPad, onPrevPad, onToggleCamera, onToggleMute, onToggleTheme, onFlyToSkyHangar }) {
     this.onSelectPad = onSelectPad;
     this.onNextPad = onNextPad;
     this.onPrevPad = onPrevPad;
     this.onToggleCamera = onToggleCamera;
     this.onToggleMute = onToggleMute;
     this.onToggleTheme = onToggleTheme;
+    this.onFlyToSkyHangar = onFlyToSkyHangar;
 
     this.activePadId = 'hq';
     this.isMuted = sound.isMuted;
@@ -48,6 +49,12 @@ export class UI {
     this.proximityPrompt = document.getElementById('proximity-prompt');
     this.hangarBanner = document.getElementById('hangar-67-banner');
     this.radarCanvas = document.getElementById('radar-canvas');
+    this.guideWidget = document.getElementById('guide-widget');
+    this.guideWidgetBody = document.getElementById('guide-widget-body');
+    this.toggleGuideBtn = document.getElementById('btn-toggle-guide');
+    this.guideHqBtn = document.getElementById('btn-guide-hq');
+    this.guideYtBtn = document.getElementById('btn-guide-yt');
+    this.guide67Btn = document.getElementById('btn-guide-67');
 
     this.updateMuteButtonUI();
   }
@@ -176,6 +183,37 @@ export class UI {
         }
       });
     }
+
+    if (this.toggleGuideBtn && this.guideWidget) {
+      this.toggleGuideBtn.addEventListener('click', () => {
+        sound.playClick();
+        const isCollapsed = this.guideWidget.classList.toggle('guide-widget--collapsed');
+        this.toggleGuideBtn.textContent = isCollapsed ? '＋' : '—';
+      });
+    }
+
+    if (this.guideHqBtn) {
+      this.guideHqBtn.addEventListener('click', () => {
+        sound.playClick();
+        const pad = HELIPADS.find(p => p.id === 'hq') || HELIPADS[0];
+        if (pad && this.onSelectPad) this.onSelectPad(pad);
+      });
+    }
+
+    if (this.guideYtBtn) {
+      this.guideYtBtn.addEventListener('click', () => {
+        sound.playClick();
+        const pad = HELIPADS.find(p => p.id === 'youtube') || HELIPADS[3];
+        if (pad && this.onSelectPad) this.onSelectPad(pad);
+      });
+    }
+
+    if (this.guide67Btn) {
+      this.guide67Btn.addEventListener('click', () => {
+        sound.playClick();
+        if (this.onFlyToSkyHangar) this.onFlyToSkyHangar();
+      });
+    }
   }
 
   updateMuteButtonUI() {
@@ -253,11 +291,11 @@ export class UI {
       <div class="hangar-67-card">
         <div class="hangar-67-top">
           <span class="hangar-67-tag">👑 ПАСХАЛКА НАЙДЕНА · SECRET HANGAR 67</span>
-          <span class="hangar-67-eq">🎵 67 BEAT PLAYING ▂▄▆█▃</span>
+          <span class="hangar-67-eq">🎵 GAZAN — 67 (20s FADE) ▂▄▆█▃</span>
         </div>
         <div class="hangar-67-graffiti">«ТЫ ЧЁ ЗАБЫЛ ЗДЕСЬ?! ДАЙ ОТДОХНУТЬ НОРМАЛЬНО!»</div>
         <div class="hangar-67-actions">
-          <button type="button" id="btn-toggle-67" class="btn-pill">🔇 Пауза / Вкл бит 67</button>
+          <button type="button" id="btn-toggle-67" class="btn-pill">🔇 Пауза / Вкл трек Gazan — 67</button>
         </div>
       </div>
     `;
@@ -266,10 +304,10 @@ export class UI {
       btn.onclick = () => {
         if (sound.isPlaying67) {
           sound.stop67MemeBeat();
-          btn.textContent = '🔊 Включить бит 67';
+          btn.textContent = '🔊 Включить Gazan — 67';
         } else {
           sound.start67MemeBeat();
-          btn.textContent = '🔇 Пауза бита 67';
+          btn.textContent = '🔇 Пауза Gazan — 67';
         }
       };
     }

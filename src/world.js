@@ -28,6 +28,7 @@ export class World {
     this.buildCollectibleStars();
     this.buildClouds();
     this.buildSecretSkyHangar();
+    this.buildWelcomeGuideSignboard();
   }
 
   buildLighting() {
@@ -1420,11 +1421,153 @@ export class World {
     ctx.font = 'italic 800 30px Inter, sans-serif';
     ctx.fillStyle = '#a3e635';
     ctx.textAlign = 'center';
-    ctx.fillText('🎵 NOW PLAYING: 67 MEME BEAT · BURGERDOM6 VIP CHILL ZONE 🍔', 512, 468);
+    ctx.fillText('🎵 NOW PLAYING: GAZAN — 67 (SIX SEVEN) · BURGERDOM6 VIP CHILL ZONE 🍔', 512, 468);
 
     const tex = new THREE.CanvasTexture(canvas);
     tex.needsUpdate = true;
     return tex;
+  }
+
+  buildWelcomeGuideSignboard() {
+    // 1. Noble Mondstadt 3D Instruction & Navigation Bulletin Board on the HQ Island
+    this.guideBoardGroup = new THREE.Group();
+    this.guideBoardGroup.position.set(-7.6, 0.5, -4.6);
+    this.guideBoardGroup.rotation.y = 0.36;
+
+    const timberMat = new THREE.MeshStandardMaterial({ color: 0x4a3525, roughness: 0.82 });
+    const stoneMat = new THREE.MeshStandardMaterial({ color: 0x9e988e, roughness: 0.85, flatShading: true });
+    const goldMat = new THREE.MeshStandardMaterial({ color: 0xd3bc8e, roughness: 0.35, metalness: 0.65 });
+    const roofMat = new THREE.MeshStandardMaterial({ color: 0xb4533c, roughness: 0.72, flatShading: true });
+
+    // Stone plinths + timber posts
+    [-2.4, 2.4].forEach((px) => {
+      const plinth = new THREE.Mesh(new THREE.BoxGeometry(0.65, 0.55, 0.65), stoneMat);
+      plinth.position.set(px, 0.28, 0);
+      this.guideBoardGroup.add(plinth);
+
+      const post = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.18, 3.8, 8), timberMat);
+      post.position.set(px, 1.9, 0);
+      post.castShadow = true;
+      this.guideBoardGroup.add(post);
+    });
+
+    // Pitched protective wooden/terracotta awning roof over the bulletin board
+    const roof = new THREE.Mesh(new THREE.BoxGeometry(5.6, 0.28, 1.15), roofMat);
+    roof.position.set(0, 3.95, 0);
+    roof.castShadow = true;
+    this.guideBoardGroup.add(roof);
+
+    const goldTrim = new THREE.Mesh(new THREE.BoxGeometry(5.3, 2.55, 0.16), goldMat);
+    goldTrim.position.set(0, 2.45, 0);
+    this.guideBoardGroup.add(goldTrim);
+
+    // Canvas texture for the 3D Instruction & Navigation Board
+    const canvas = document.createElement('canvas');
+    canvas.width = 1024;
+    canvas.height = 512;
+    const ctx = canvas.getContext('2d');
+
+    ctx.fillStyle = '#181e2c';
+    ctx.fillRect(0, 0, 1024, 512);
+
+    ctx.strokeStyle = '#d3bc8e';
+    ctx.lineWidth = 10;
+    ctx.strokeRect(18, 18, 988, 476);
+
+    ctx.fillStyle = '#d3bc8e';
+    ctx.font = '800 42px Inter, system-ui, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('🧭 ПУТЕВОДИТЕЛЬ · ЧТО ЗДЕСЬ ДЕЛАТЬ?', 512, 82);
+
+    ctx.fillStyle = 'rgba(211, 188, 142, 0.25)';
+    ctx.fillRect(64, 105, 896, 3);
+
+    ctx.textAlign = 'left';
+    ctx.font = '700 32px Inter, system-ui, sans-serif';
+    ctx.fillStyle = '#f8f4ec';
+    ctx.fillText('🚁 1. КЛИКАЙ ПО ОСТРОВАМ или летай на WASD (Автопилот / Ручной)', 56, 172);
+    ctx.fillStyle = '#fde68a';
+    ctx.fillText('⭐ 2. СОБЕРИ ВСЕ 10 ЗВЁЗД на время для ранга пилота S+', 56, 244);
+    ctx.fillStyle = '#7dd3fc';
+    ctx.fillText('🏛️ 3. ОТКРЫВАЙ КЕЙСЫ: подлети к площадке [H] или жми кнопки внизу', 56, 316);
+    ctx.fillStyle = '#f472b6';
+    ctx.fillText('☁️ 4. СЕКРЕТ 67: зажми [SPACE] и взлети ВЫШЕ ОБЛАКОВ над центром!', 56, 388);
+
+    ctx.textAlign = 'center';
+    ctx.font = '800 28px Inter, system-ui, sans-serif';
+    ctx.fillStyle = '#d3bc8e';
+    ctx.fillText('✨ Кликни по этому стенду или кнопке «🧭 Гид» слева для быстрой навигации ✨', 512, 456);
+
+    const boardTex = new THREE.CanvasTexture(canvas);
+    boardTex.needsUpdate = true;
+    const boardMat = new THREE.MeshBasicMaterial({ map: boardTex });
+
+    const frontPlane = new THREE.Mesh(new THREE.PlaneGeometry(5.1, 2.4), boardMat);
+    frontPlane.position.set(0, 2.45, 0.1);
+    this.guideBoardGroup.add(frontPlane);
+
+    const backPlane = new THREE.Mesh(new THREE.PlaneGeometry(5.1, 2.4), boardMat);
+    backPlane.position.set(0, 2.45, -0.1);
+    backPlane.rotation.y = Math.PI;
+    this.guideBoardGroup.add(backPlane);
+
+    this.scene.add(this.guideBoardGroup);
+
+    // 2. Classic Mondstadt Directional Signpost (Указатель направлений) on the right side of HQ
+    const postGroup = new THREE.Group();
+    postGroup.position.set(7.6, 0.5, -4.6);
+    postGroup.rotation.y = -0.32;
+
+    const baseStone = new THREE.Mesh(new THREE.CylinderGeometry(0.45, 0.58, 0.6, 8), stoneMat);
+    baseStone.position.y = 0.3;
+    postGroup.add(baseStone);
+
+    const mainPole = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.18, 4.2, 8), timberMat);
+    mainPole.position.y = 2.1;
+    mainPole.castShadow = true;
+    postGroup.add(mainPole);
+
+    const signs = [
+      { y: 3.65, rot: 0.15, text: '⬆ СЕВЕР: Кейсы & YouTube', col: '#d3bc8e' },
+      { y: 3.0, rot: -0.2, text: '⬅ ЗАПАД: EdTech & Контакты', col: '#7dd3fc' },
+      { y: 2.35, rot: 0.25, text: '➡ ВОСТОК: AI & Продукты', col: '#86efac' },
+      { y: 1.7, rot: 0.0, text: '☁️ ВВЕРХ [Space]: Ангар 67', col: '#f472b6' }
+    ];
+
+    signs.forEach((sg) => {
+      const sCanvas = document.createElement('canvas');
+      sCanvas.width = 512;
+      sCanvas.height = 96;
+      const sCtx = sCanvas.getContext('2d');
+      sCtx.fillStyle = '#1e2536';
+      sCtx.fillRect(0, 0, 512, 96);
+      sCtx.strokeStyle = sg.col;
+      sCtx.lineWidth = 6;
+      sCtx.strokeRect(4, 4, 504, 88);
+      sCtx.fillStyle = '#f8f4ec';
+      sCtx.font = '800 30px Inter, sans-serif';
+      sCtx.textAlign = 'center';
+      sCtx.fillText(sg.text, 256, 58);
+
+      const sTex = new THREE.CanvasTexture(sCanvas);
+      const sMat = new THREE.MeshBasicMaterial({ map: sTex });
+      const plank = new THREE.Mesh(new THREE.BoxGeometry(2.7, 0.48, 0.1), timberMat);
+      plank.position.set(0, sg.y, 0);
+      plank.rotation.y = sg.rot;
+
+      const labelF = new THREE.Mesh(new THREE.PlaneGeometry(2.62, 0.44), sMat);
+      labelF.position.z = 0.06;
+      plank.add(labelF);
+
+      const labelB = new THREE.Mesh(new THREE.PlaneGeometry(2.62, 0.44), sMat);
+      labelB.position.z = -0.06;
+      labelB.rotation.y = Math.PI;
+      plank.add(labelB);
+
+      postGroup.add(plank);
+    });
+
+    this.scene.add(postGroup);
   }
 
   buildSecretSkyHangar() {

@@ -101,6 +101,17 @@ class App {
         }
       }
 
+      // Check click on 3D Welcome & Navigation Bulletin Board on HQ Island
+      if (this.world.guideBoardGroup) {
+        const guideHits = this.raycaster.intersectObject(this.world.guideBoardGroup, true);
+        if (guideHits.length > 0) {
+          sound.playClick();
+          const helpModal = document.getElementById('help-modal');
+          if (helpModal) helpModal.showModal();
+          return;
+        }
+      }
+
       const hitObjects = this.world.helipads.map(h => h.group);
       const intersects = this.raycaster.intersectObjects(hitObjects, true);
       if (intersects.length > 0) {
@@ -126,6 +137,7 @@ class App {
       this.raycaster.setFromCamera(this.mouse, this.camera);
       const hitObjects = this.world.helipads.map(h => h.group);
       if (this.world.skyIslandGroup) hitObjects.push(this.world.skyIslandGroup);
+      if (this.world.guideBoardGroup) hitObjects.push(this.world.guideBoardGroup);
       const intersects = this.raycaster.intersectObjects(hitObjects, true);
       this.renderer.domElement.style.cursor = intersects.length > 0 ? 'pointer' : 'grab';
     });
@@ -191,6 +203,9 @@ class App {
       onToggleMute: () => {},
       onToggleTheme: (weatherMode) => {
         this.world.setNightMode(weatherMode);
+      },
+      onFlyToSkyHangar: () => {
+        this.flyToSkyHangar();
       }
     });
 

@@ -79,11 +79,31 @@
           ✉ <span class="btn-text">Обсудить проект</span>
         </a>
 
-        <button class="hud-btn" id="btn-help" title="Управление и навигация">
-          ❓
+        <button class="hud-btn" id="btn-help" title="Путеводитель и управление">
+          🧭 <span class="btn-text">Гид</span>
         </button>
       </div>
     </header>
+
+    <!-- FLOATING MONDSTADT GUIDE & QUICK NAVIGATION WINDOW -->
+    <aside class="guide-widget" id="guide-widget">
+      <div class="guide-widget__header">
+        <span class="guide-widget__title">🧭 Путеводитель · Что делать?</span>
+        <button type="button" class="guide-widget__toggle" id="btn-toggle-guide" title="Свернуть / Развернуть памятку">—</button>
+      </div>
+      <div class="guide-widget__body" id="guide-widget-body">
+        <ul class="guide-steps">
+          <li><strong>1. Острова-кейсы:</strong> кликай по островам или кнопкам внизу для автопилота (или летай сам на <span class="key-badge">W</span><span class="key-badge">A</span><span class="key-badge">S</span><span class="key-badge">D</span>).</li>
+          <li><strong>2. Спидран ⭐ 10/10:</strong> собери все золотые звёзды над островами на рекорд времени!</li>
+          <li><strong>3. Пасхалка 67 ☁️:</strong> зажми <span class="key-badge">Space</span> и взлети <b>выше облаков</b> (90м) в секретный ангар под трек <em>Gazan — 67</em>!</li>
+        </ul>
+        <div class="guide-quick-actions">
+          <button type="button" class="guide-action-btn" id="btn-guide-hq">🏰 01. Штаб</button>
+          <button type="button" class="guide-action-btn" id="btn-guide-yt">▶️ 04. YouTube</button>
+          <button type="button" class="guide-action-btn guide-action-btn--secret" id="btn-guide-67">☁️ Взлететь в Ангар 67</button>
+        </div>
+      </div>
+    </aside>
 
     <!-- SECRET SKY HANGAR 67 GRAFFITI BANNER -->
     <div class="hangar-67-banner" id="hangar-67-banner" style="display: none;"></div>
@@ -146,39 +166,39 @@
   <dialog id="help-modal">
     <div class="help-card">
       <div class="help-header">
-        <h3>🚁 Управление и навигация (Портфолио 2.0)</h3>
+        <h3>🧭 Путеводитель и Навигация по Архипелагу</h3>
         <button class="modal-close-btn" onclick="document.getElementById('help-modal').close()">✕</button>
       </div>
 
       <div class="help-grid">
         <div class="help-item">
-          <div class="help-icon">⚡</div>
+          <div class="help-icon">🚁</div>
           <div>
-            <h4>Клик по 3D-островам и быстрое листание</h4>
-            <p>Кликайте прямо на любой 3D-остров на карте, выбирайте из 10 станций внизу или жмите <strong>◀ Пред. / След. ▶</strong>. Боевой вертолёт стремительно перелетает между точками за ~1 секунду.</p>
+            <h4>1. Автопилот в 1 клик или ручной полёт</h4>
+            <p>Кликайте прямо на любой 3D-остров в мире, выбирайте из 10 локаций в нижней панели или летайте вручную на <span class="key-badge">W</span> <span class="key-badge">A</span> <span class="key-badge">S</span> <span class="key-badge">D</span> (<span class="key-badge">Shift</span> — ускорение).</p>
           </div>
         </div>
 
         <div class="help-item">
-          <div class="help-icon">🕹️</div>
+          <div class="help-icon">⭐</div>
           <div>
-            <h4>Ручной боевой полёт и режим Ночь/День</h4>
-            <p>Клавиши <span class="key-badge">W</span> <span class="key-badge">A</span> <span class="key-badge">S</span> <span class="key-badge">D</span> или стрелочки — свободный полёт. <span class="key-badge">Shift</span> — форсаж, <span class="key-badge">C</span> — смена ракурса камеры, кнопка <strong>🌙 Ночь</strong> — атмосферная неоновая подсветка островов.</p>
+            <h4>2. Спидран-челлендж: собери 10 звёзд на время</h4>
+            <p>Над каждым островом парит золотая звезда. Соберите все <strong>10 / 10</strong>, чтобы увидеть итоговое время прохождения и получить ранг пилота <strong>S+</strong>!</p>
           </div>
         </div>
 
         <div class="help-item">
-          <div class="help-icon">🏛️</div>
+          <div class="help-icon">☁️</div>
           <div>
-            <h4>10 тематических 3D-островов</h4>
-            <p>Каждая станция имеет свой 3D-символ: башенный кран у <strong>HgStroy</strong>, боевой танк у <strong>Warpath Wiki</strong>, 3D-кнопка YouTube и бургер у <strong>@burgerdom6 &amp; WarpathHub</strong>, шапочка выпускника у <strong>Study Up</strong>, смартфон у <strong>vertical.team</strong>, AI-ядро у <strong>Dmitry OS</strong>, рожок мороженого у <strong>foodiCE</strong> и бумажный самолётик у <strong>Контактов</strong>.</p>
+            <h4>3. Секретный Небесный Ангар «67» выше облаков</h4>
+            <p>Зажмите <span class="key-badge">Space</span> (или нажмите кнопку <strong>«☁️ Взлететь в Ангар 67»</strong> в путеводителе слева), чтобы подняться выше облаков к секретному ангару с граффити и треком <em>Gazan — 67 (Six Seven)</em>!</p>
           </div>
         </div>
       </div>
 
       <div style="text-align: center; margin-top: 10px;">
-        <button class="btn btn--primary" onclick="document.getElementById('help-modal').close()" style="background: #dc2626; width: 100%;">
-          Отлично, в полёт! 🚁
+        <button class="btn btn--primary" onclick="document.getElementById('help-modal').close()" style="background: #d3bc8e; color: #161b26; width: 100%; font-weight: 800;">
+          Понятно, в полёт! 🚁
         </button>
       </div>
     </div>
