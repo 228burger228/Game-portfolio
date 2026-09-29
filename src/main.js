@@ -35,8 +35,8 @@ class App {
     const container = document.getElementById('canvas-container');
 
     this.scene = new THREE.Scene();
-    this.scene.background = new THREE.Color(0x0284c7);
-    this.scene.fog = new THREE.FogExp2(0x67e8f9, 0.0042);
+    this.scene.background = new THREE.Color(0x4a8db7);
+    this.scene.fog = new THREE.FogExp2(0xa8d0e6, 0.0032);
 
     this.camera = new THREE.PerspectiveCamera(
       45,
@@ -58,24 +58,24 @@ class App {
     this.renderer.shadowMap.enabled = true;
     this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    this.renderer.toneMappingExposure = 1.12;
+    this.renderer.toneMappingExposure = 0.94;
 
-    // Generate HDR-like PBR Environment Reflections (IBL) for metallic armor & glass
+    // Subtle, natural PBR Environment Reflections (IBL) without harsh glare
     const pmremGenerator = new THREE.PMREMGenerator(this.renderer);
     pmremGenerator.compileEquirectangularShader();
     this.scene.environment = pmremGenerator.fromScene(new RoomEnvironment(), 0.04).texture;
-    this.scene.environmentIntensity = 0.65;
+    this.scene.environmentIntensity = 0.36;
 
-    // AAA Post-Processing Pipeline (RenderPass + UnrealBloomPass)
+    // Selective Post-Processing Bloom: threshold > 1.0 so ONLY true light sources glow!
     this.composer = new EffectComposer(this.renderer);
     const renderPass = new RenderPass(this.scene, this.camera);
     this.composer.addPass(renderPass);
 
     this.bloomPass = new UnrealBloomPass(
       new THREE.Vector2(window.innerWidth, window.innerHeight),
-      0.26, // subtle bloom strength
-      0.55, // radius
-      0.84  // high threshold so only bright neon, sun & engines glow
+      0.11, // gentle, noble glow strength
+      0.32, // tight radius (no blurry screen)
+      1.06  // threshold > 1.0: white clouds/walls never bloom, only emissive > 1.0 glows!
     );
     this.composer.addPass(this.bloomPass);
 

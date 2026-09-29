@@ -471,27 +471,26 @@ export class Helicopter {
     this.beaconLight.position.set(0, 2.18, 4.35);
     this.group.add(this.beaconLight);
 
-    // Twin Turbine Afterburner Glow Cones (for Bloom & Turbo/Autopilot)
+    // Twin Turbine Afterburner Glow Cones (subtle, only visible when accelerating/flying fast)
     this.afterburners = [];
     const flameMat = new THREE.MeshBasicMaterial({
-      color: 0x38bdf8,
+      color: 0x60a5fa,
       transparent: true,
-      opacity: 0.75,
-      blending: THREE.AdditiveBlending,
+      opacity: 0.35,
       depthWrite: false
     });
     [-0.52, 0.52].forEach((xPos) => {
-      const coneGeo = new THREE.ConeGeometry(0.16, 1.1, 12);
+      const coneGeo = new THREE.ConeGeometry(0.14, 0.85, 12);
       coneGeo.rotateX(Math.PI / 2);
       const flame = new THREE.Mesh(coneGeo, flameMat.clone());
-      flame.position.set(xPos, 1.38, 1.85);
+      flame.position.set(xPos, 1.38, 1.75);
       this.group.add(flame);
       this.afterburners.push(flame);
     });
   }
 
   buildSearchlight() {
-    this.searchlight = new THREE.SpotLight(0xfffbeb, 6.5, 52, Math.PI / 5, 0.4, 1.3);
+    this.searchlight = new THREE.SpotLight(0xfffbeb, 2.2, 42, Math.PI / 5, 0.5, 1.5);
     this.searchlight.position.set(0, 0.45, -2.5);
     this.searchlight.target.position.set(0, -8, -16);
     this.group.add(this.searchlight);
@@ -499,18 +498,17 @@ export class Helicopter {
   }
 
   buildDownwashEffect() {
-    const ringGeo = new THREE.RingGeometry(1.5, 4.8, 48);
+    const ringGeo = new THREE.RingGeometry(1.6, 4.4, 48);
     ringGeo.rotateX(-Math.PI / 2);
 
     const canvas = document.createElement('canvas');
     canvas.width = 256;
     canvas.height = 256;
     const ctx = canvas.getContext('2d');
-    const grad = ctx.createRadialGradient(128, 128, 32, 128, 128, 126);
+    const grad = ctx.createRadialGradient(128, 128, 36, 128, 128, 126);
     grad.addColorStop(0, 'rgba(255, 255, 255, 0.0)');
-    grad.addColorStop(0.35, 'rgba(224, 242, 254, 0.55)');
-    grad.addColorStop(0.65, 'rgba(56, 189, 248, 0.28)');
-    grad.addColorStop(0.88, 'rgba(255, 255, 255, 0.45)');
+    grad.addColorStop(0.4, 'rgba(205, 228, 242, 0.28)');
+    grad.addColorStop(0.75, 'rgba(205, 228, 242, 0.18)');
     grad.addColorStop(1, 'rgba(255, 255, 255, 0)');
     ctx.fillStyle = grad;
     ctx.fillRect(0, 0, 256, 256);
@@ -520,15 +518,14 @@ export class Helicopter {
       map: texture,
       transparent: true,
       opacity: 0,
-      depthWrite: false,
-      blending: THREE.AdditiveBlending
+      depthWrite: false
     });
 
     this.downwashRing = new THREE.Mesh(ringGeo, this.downwashMat);
     this.downwashRing.position.set(0, 0.08, 0);
     this.scene.add(this.downwashRing);
 
-    const outerGeo = new THREE.RingGeometry(3.8, 6.8, 48);
+    const outerGeo = new THREE.RingGeometry(3.6, 6.2, 48);
     outerGeo.rotateX(-Math.PI / 2);
     this.downwashOuterMat = this.downwashMat.clone();
     this.downwashOuterRing = new THREE.Mesh(outerGeo, this.downwashOuterMat);
@@ -580,7 +577,7 @@ export class Helicopter {
     const time = performance.now() * 0.001;
 
     if (this.beaconLight) {
-      this.beaconLight.material.color.setHex((Math.floor(time * 4) % 2 === 0) ? 0xffffff : 0xdc2626);
+      this.beaconLight.material.color.setHex((Math.floor(time * 4) % 2 === 0) ? 0xfef3c7 : 0xdc2626);
     }
 
     if (this.isAutopilot && this.autopilotCurve) {
@@ -632,18 +629,18 @@ export class Helicopter {
     this.mainRotorGroup.rotation.y += this.rotorRpm * delta;
     this.tailRotorGroup.rotation.x += this.rotorRpm * delta * 1.6;
 
-    const blurOpacity = THREE.MathUtils.smoothstep(this.rotorRpm, 18, this.maxRpm) * 0.38;
+    const blurOpacity = THREE.MathUtils.smoothstep(this.rotorRpm, 18, this.maxRpm) * 0.32;
     this.rotorDisc.material.opacity = blurOpacity;
 
-    // Update Twin Turbine Afterburner Glow
-    const speedFactor = this.isAutopilot ? 1.0 : Math.min(1.0, this.velocity.length() / 32.0);
+    // Update Twin Turbine Afterburner Glow (subtle)
+    const speedFactor = this.isAutopilot ? 0.85 : Math.min(1.0, this.velocity.length() / 36.0);
     if (this.afterburners) {
       this.afterburners.forEach((flame, idx) => {
-        const flicker = 0.85 + Math.sin(time * 42 + idx * 3) * 0.22;
-        const scaleZ = (0.35 + speedFactor * 1.15) * flicker;
+        const flicker = 0.9 + Math.sin(time * 36 + idx * 3) * 0.12;
+        const scaleZ = (0.2 + speedFactor * 0.85) * flicker;
         flame.scale.set(1, 1, scaleZ);
-        flame.material.opacity = (0.18 + speedFactor * 0.72) * flicker;
-        flame.material.color.setHex(input?.turbo || this.isAutopilot ? 0x38bdf8 : 0xf59e0b);
+        flame.material.opacity = speedFactor * 0.42 * flicker;
+        flame.material.color.setHex(input?.turbo || this.isAutopilot ? 0x7dd3fc : 0xfbbf24);
       });
     }
 
@@ -654,23 +651,23 @@ export class Helicopter {
     this.group.rotateX(this.currentPitch);
     this.group.rotateZ(this.currentRoll);
 
-    // Dual Animated Rotor Downwash Rings on Water/Ground
+    // Subtle Rotor Downwash Rings on Water/Ground
     if (this.downwashRing && this.downwashOuterRing) {
       this.downwashRing.position.set(this.position.x, 0.09, this.position.z);
       this.downwashOuterRing.position.set(this.position.x, 0.07, this.position.z);
       const altitude = Math.max(0.1, this.position.y);
-      const intensity = Math.max(0, 1 - altitude / 16) * (this.rotorRpm / this.maxRpm);
+      const intensity = Math.max(0, 1 - altitude / 14) * (this.rotorRpm / this.maxRpm);
 
-      const wave1 = (time * 1.8) % 1.0;
-      const wave2 = (time * 1.8 + 0.5) % 1.0;
+      const wave1 = (time * 1.4) % 1.0;
+      const wave2 = (time * 1.4 + 0.5) % 1.0;
 
-      const s1 = 0.65 + wave1 * 0.85;
+      const s1 = 0.65 + wave1 * 0.75;
       this.downwashRing.scale.set(s1, s1, 1);
-      this.downwashMat.opacity = intensity * (1.0 - wave1) * 0.75;
+      this.downwashMat.opacity = intensity * (1.0 - wave1) * 0.35;
 
-      const s2 = 0.65 + wave2 * 0.85;
+      const s2 = 0.65 + wave2 * 0.75;
       this.downwashOuterRing.scale.set(s2, s2, 1);
-      this.downwashOuterMat.opacity = intensity * (1.0 - wave2) * 0.55;
+      this.downwashOuterMat.opacity = intensity * (1.0 - wave2) * 0.24;
     }
   }
 

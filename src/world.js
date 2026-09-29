@@ -31,10 +31,10 @@ export class World {
   }
 
   buildLighting() {
-    this.ambientLight = new THREE.AmbientLight(0xe0f2fe, 1.25);
+    this.ambientLight = new THREE.AmbientLight(0xfaf5eb, 1.08);
     this.scene.add(this.ambientLight);
 
-    this.sunLight = new THREE.DirectionalLight(0xfff1e6, 2.6);
+    this.sunLight = new THREE.DirectionalLight(0xfff4dc, 1.85);
     this.sunLight.position.set(65, 78, -55);
     this.sunLight.castShadow = true;
 
@@ -50,18 +50,18 @@ export class World {
 
     this.scene.add(this.sunLight);
 
-    this.hemiLight = new THREE.HemisphereLight(0xbae6fd, 0x1e293b, 0.85);
+    this.hemiLight = new THREE.HemisphereLight(0xdbeafe, 0x4b5563, 0.68);
     this.scene.add(this.hemiLight);
   }
 
   buildSkyDome() {
     const skyGeo = new THREE.SphereGeometry(420, 32, 24);
     this.skyUniforms = {
-      uTopColor: { value: new THREE.Color(0x0284c7) },
-      uHorizonColor: { value: new THREE.Color(0x7dd3fc) },
-      uBottomColor: { value: new THREE.Color(0x0c4a6e) },
+      uTopColor: { value: new THREE.Color(0x3a7ca5) },
+      uHorizonColor: { value: new THREE.Color(0xcde4f2) },
+      uBottomColor: { value: new THREE.Color(0x1d4e68) },
       uSunDir: { value: new THREE.Vector3(0.55, 0.45, -0.65).normalize() },
-      uSunColor: { value: new THREE.Color(0xfff7ed) },
+      uSunColor: { value: new THREE.Color(0xfff1d0) },
       uStarIntensity: { value: 0.0 },
       uTime: { value: 0 }
     };
@@ -97,22 +97,22 @@ export class World {
         void main() {
           vec3 dir = normalize(vWorldPos);
           float h = clamp(dir.y, 0.0, 1.0);
-          vec3 col = mix(uHorizonColor, uTopColor, pow(h, 0.55));
+          vec3 col = mix(uHorizonColor, uTopColor, pow(h, 0.6));
           if (dir.y < 0.0) {
             col = mix(uHorizonColor, uBottomColor, clamp(-dir.y * 3.0, 0.0, 1.0));
           }
 
-          // Sun disk & atmospheric Mie glow
+          // Calm, soft sun disk without blinding bloom
           float sunAmt = max(dot(dir, uSunDir), 0.0);
-          col += uSunColor * pow(sunAmt, 12.0) * 0.45;
-          col += uSunColor * smoothstep(0.996, 0.9995, sunAmt) * 2.2;
+          col += uSunColor * pow(sunAmt, 16.0) * 0.22;
+          col += uSunColor * smoothstep(0.997, 0.9996, sunAmt) * 0.85;
 
           // Subtle stars at Sunset / Night
           if (uStarIntensity > 0.01 && dir.y > 0.05) {
             float s = hash(floor(dir * 260.0));
             if (s > 0.994) {
               float twinkle = 0.55 + 0.45 * sin(uTime * 3.0 + s * 100.0);
-              col += vec3(0.9, 0.95, 1.0) * twinkle * uStarIntensity * smoothstep(0.05, 0.35, dir.y);
+              col += vec3(0.88, 0.92, 0.98) * twinkle * uStarIntensity * smoothstep(0.05, 0.35, dir.y);
             }
           }
 
@@ -125,99 +125,99 @@ export class World {
     this.scene.add(this.skyDome);
   }
 
-  // Supports boolean or 4-mode index (0: Day, 1: Genshin Sunset, 2: Rust Fog Dawn, 3: Cyber Night)
+  // Supports boolean or 4-mode index (0: Mondstadt Day, 1: Golden Dusk, 2: Misty Dawn, 3: Starlight Night)
   setNightMode(modeOrBool) {
     const mode = typeof modeOrBool === 'boolean' ? (modeOrBool ? 3 : 0) : (modeOrBool % 4);
     if (mode === 0) {
-      // 0: Genshin Azure Day
-      this.scene.fog.color.setHex(0x67e8f9);
-      this.scene.fog.density = 0.0042;
-      this.ambientLight.color.setHex(0xe0f2fe);
-      this.ambientLight.intensity = 1.25;
-      this.sunLight.color.setHex(0xfff7ed);
-      this.sunLight.intensity = 2.6;
-      this.hemiLight.intensity = 0.85;
-      this.skyUniforms.uTopColor.value.setHex(0x0284c7);
-      this.skyUniforms.uHorizonColor.value.setHex(0x7dd3fc);
-      this.skyUniforms.uSunColor.value.setHex(0xfff7ed);
+      // 0: Mondstadt Sunny Morning (Calm Cerulean & Warm Sunlight)
+      this.scene.fog.color.setHex(0xa8d0e6);
+      this.scene.fog.density = 0.0032;
+      this.ambientLight.color.setHex(0xfaf5eb);
+      this.ambientLight.intensity = 1.08;
+      this.sunLight.color.setHex(0xfff4dc);
+      this.sunLight.intensity = 1.85;
+      this.hemiLight.intensity = 0.68;
+      this.skyUniforms.uTopColor.value.setHex(0x3a7ca5);
+      this.skyUniforms.uHorizonColor.value.setHex(0xcde4f2);
+      this.skyUniforms.uSunColor.value.setHex(0xfff1d0);
       this.skyUniforms.uSunDir.value.set(0.55, 0.45, -0.65).normalize();
       this.skyUniforms.uStarIntensity.value = 0.0;
       if (this.waterUniforms) {
-        this.waterUniforms.uDeepColor.value.setHex(0x083344);
-        this.waterUniforms.uShallowColor.value.setHex(0x06b6d4);
-        this.waterUniforms.uSunColor.value.setHex(0xfef08a);
+        this.waterUniforms.uDeepColor.value.setHex(0x1b4d66);
+        this.waterUniforms.uShallowColor.value.setHex(0x3d8596);
+        this.waterUniforms.uSunColor.value.setHex(0xf5e6c8);
       }
     } else if (mode === 1) {
-      // 1: Genshin Golden Sunset
-      this.scene.fog.color.setHex(0xfb923c);
-      this.scene.fog.density = 0.0052;
-      this.ambientLight.color.setHex(0xfed7aa);
-      this.ambientLight.intensity = 1.05;
-      this.sunLight.color.setHex(0xf97316);
-      this.sunLight.intensity = 2.9;
-      this.hemiLight.intensity = 0.75;
-      this.skyUniforms.uTopColor.value.setHex(0x3b0764);
-      this.skyUniforms.uHorizonColor.value.setHex(0xfb923c);
-      this.skyUniforms.uSunColor.value.setHex(0xfde047);
-      this.skyUniforms.uSunDir.value.set(0.65, 0.16, -0.72).normalize();
-      this.skyUniforms.uStarIntensity.value = 0.35;
+      // 1: Mondstadt Golden Dusk (Warm Amber & Soft Lavender)
+      this.scene.fog.color.setHex(0xd99b78);
+      this.scene.fog.density = 0.0038;
+      this.ambientLight.color.setHex(0xf3d5b5);
+      this.ambientLight.intensity = 0.95;
+      this.sunLight.color.setHex(0xf59e0b);
+      this.sunLight.intensity = 1.95;
+      this.hemiLight.intensity = 0.6;
+      this.skyUniforms.uTopColor.value.setHex(0x3b3355);
+      this.skyUniforms.uHorizonColor.value.setHex(0xe29578);
+      this.skyUniforms.uSunColor.value.setHex(0xfde68a);
+      this.skyUniforms.uSunDir.value.set(0.65, 0.18, -0.72).normalize();
+      this.skyUniforms.uStarIntensity.value = 0.25;
       if (this.waterUniforms) {
-        this.waterUniforms.uDeepColor.value.setHex(0x1e1b4b);
-        this.waterUniforms.uShallowColor.value.setHex(0x0e7490);
-        this.waterUniforms.uSunColor.value.setHex(0xfb923c);
+        this.waterUniforms.uDeepColor.value.setHex(0x1f2942);
+        this.waterUniforms.uShallowColor.value.setHex(0x3b6978);
+        this.waterUniforms.uSunColor.value.setHex(0xf59e0b);
       }
     } else if (mode === 2) {
-      // 2: Rust Tactical Misty Dawn
+      // 2: Wolvendom Misty Dawn (Calm Slate Mist)
       this.scene.fog.color.setHex(0x94a3b8);
-      this.scene.fog.density = 0.0075;
+      this.scene.fog.density = 0.0058;
       this.ambientLight.color.setHex(0xcbd5e1);
-      this.ambientLight.intensity = 0.95;
-      this.sunLight.color.setHex(0xfde68a);
-      this.sunLight.intensity = 1.95;
-      this.hemiLight.intensity = 0.65;
-      this.skyUniforms.uTopColor.value.setHex(0x334155);
+      this.ambientLight.intensity = 0.88;
+      this.sunLight.color.setHex(0xfef3c7);
+      this.sunLight.intensity = 1.45;
+      this.hemiLight.intensity = 0.58;
+      this.skyUniforms.uTopColor.value.setHex(0x475569);
       this.skyUniforms.uHorizonColor.value.setHex(0x94a3b8);
-      this.skyUniforms.uSunColor.value.setHex(0xfde68a);
+      this.skyUniforms.uSunColor.value.setHex(0xfef3c7);
       this.skyUniforms.uSunDir.value.set(-0.55, 0.22, -0.65).normalize();
       this.skyUniforms.uStarIntensity.value = 0.0;
       if (this.waterUniforms) {
-        this.waterUniforms.uDeepColor.value.setHex(0x0f172a);
-        this.waterUniforms.uShallowColor.value.setHex(0x155e75);
-        this.waterUniforms.uSunColor.value.setHex(0xfde68a);
+        this.waterUniforms.uDeepColor.value.setHex(0x1e293b);
+        this.waterUniforms.uShallowColor.value.setHex(0x335c67);
+        this.waterUniforms.uSunColor.value.setHex(0xe2e8f0);
       }
     } else {
-      // 3: Cyber Neon Night
-      this.scene.fog.color.setHex(0x060b16);
-      this.scene.fog.density = 0.0048;
-      this.ambientLight.color.setHex(0x38bdf8);
+      // 3: Mondstadt Starlight Night (Deep Indigo & Warm Lanterns)
+      this.scene.fog.color.setHex(0x0f172a);
+      this.scene.fog.density = 0.0038;
+      this.ambientLight.color.setHex(0x64748b);
       this.ambientLight.intensity = 0.52;
-      this.sunLight.color.setHex(0x818cf8);
-      this.sunLight.intensity = 1.15;
-      this.hemiLight.intensity = 0.4;
-      this.skyUniforms.uTopColor.value.setHex(0x020617);
-      this.skyUniforms.uHorizonColor.value.setHex(0x0f172a);
-      this.skyUniforms.uSunColor.value.setHex(0x38bdf8);
+      this.sunLight.color.setHex(0x93c5fd);
+      this.sunLight.intensity = 0.95;
+      this.hemiLight.intensity = 0.38;
+      this.skyUniforms.uTopColor.value.setHex(0x090d16);
+      this.skyUniforms.uHorizonColor.value.setHex(0x1e293b);
+      this.skyUniforms.uSunColor.value.setHex(0x93c5fd);
       this.skyUniforms.uSunDir.value.set(0.3, 0.35, -0.85).normalize();
-      this.skyUniforms.uStarIntensity.value = 1.0;
+      this.skyUniforms.uStarIntensity.value = 0.85;
       if (this.waterUniforms) {
-        this.waterUniforms.uDeepColor.value.setHex(0x020617);
-        this.waterUniforms.uShallowColor.value.setHex(0x0369a1);
-        this.waterUniforms.uSunColor.value.setHex(0x38bdf8);
+        this.waterUniforms.uDeepColor.value.setHex(0x091326);
+        this.waterUniforms.uShallowColor.value.setHex(0x163a52);
+        this.waterUniforms.uSunColor.value.setHex(0x93c5fd);
       }
     }
   }
 
   buildTerrain() {
-    // 1. Custom GLSL Ocean Water Shader (Gerstner Waves + Fresnel + Specular Sun Trail + Foam)
+    // 1. Cider Lake Water Shader (Calm, Painterly Waves without harsh neon glare)
     const waterGeo = new THREE.PlaneGeometry(520, 520, 128, 128);
     waterGeo.rotateX(-Math.PI / 2);
 
     this.waterUniforms = {
       uTime: { value: 0 },
-      uDeepColor: { value: new THREE.Color(0x083344) },
-      uShallowColor: { value: new THREE.Color(0x06b6d4) },
+      uDeepColor: { value: new THREE.Color(0x1b4d66) },
+      uShallowColor: { value: new THREE.Color(0x3d8596) },
       uSunDir: { value: new THREE.Vector3(0.55, 0.45, -0.65).normalize() },
-      uSunColor: { value: new THREE.Color(0xfef08a) }
+      uSunColor: { value: new THREE.Color(0xf5e6c8) }
     };
 
     const waterMat = new THREE.ShaderMaterial({
@@ -231,15 +231,14 @@ export class World {
 
         void main() {
           vec3 pos = position;
-          float w1 = sin(pos.x * 0.08 + uTime * 1.6) * cos(pos.z * 0.07 + uTime * 1.3) * 0.38;
-          float w2 = sin((pos.x * 0.14 - pos.z * 0.11) + uTime * 2.3) * 0.18;
-          float w3 = cos(pos.z * 0.22 + uTime * 2.9) * 0.08;
+          float w1 = sin(pos.x * 0.07 + uTime * 1.2) * cos(pos.z * 0.06 + uTime * 1.0) * 0.26;
+          float w2 = sin((pos.x * 0.12 - pos.z * 0.09) + uTime * 1.7) * 0.12;
+          float w3 = cos(pos.z * 0.18 + uTime * 2.1) * 0.05;
           pos.y += w1 + w2 + w3;
           vWaveHeight = w1 + w2 + w3;
 
-          // Approximate wave normal
-          float dx = cos(pos.x * 0.08 + uTime * 1.6) * 0.08 * 0.38 + cos((pos.x * 0.14 - pos.z * 0.11) + uTime * 2.3) * 0.14 * 0.18;
-          float dz = -sin(pos.z * 0.07 + uTime * 1.3) * 0.07 * 0.38 - cos((pos.x * 0.14 - pos.z * 0.11) + uTime * 2.3) * 0.11 * 0.18;
+          float dx = cos(pos.x * 0.07 + uTime * 1.2) * 0.07 * 0.26 + cos((pos.x * 0.12 - pos.z * 0.09) + uTime * 1.7) * 0.12 * 0.12;
+          float dz = -sin(pos.z * 0.06 + uTime * 1.0) * 0.06 * 0.26 - cos((pos.x * 0.12 - pos.z * 0.09) + uTime * 1.7) * 0.09 * 0.12;
           vNormal = normalize(vec3(-dx, 1.0, -dz));
 
           vec4 wp = modelMatrix * vec4(pos, 1.0);
@@ -261,28 +260,23 @@ export class World {
           vec3 viewDir = normalize(cameraPosition - vWorldPos);
           vec3 norm = normalize(vNormal);
 
-          // Fresnel reflection factor
-          float fresnel = pow(1.0 - max(dot(viewDir, norm), 0.0), 3.0);
-          vec3 waterCol = mix(uShallowColor, uDeepColor, clamp(fresnel * 0.85 + 0.15, 0.0, 1.0));
+          // Gentle Fresnel reflection
+          float fresnel = pow(1.0 - max(dot(viewDir, norm), 0.0), 2.8);
+          vec3 waterCol = mix(uShallowColor, uDeepColor, clamp(fresnel * 0.75 + 0.18, 0.0, 1.0));
 
-          // Wave crest turquoise highlight & subtle whitecap foam
-          float crest = smoothstep(0.22, 0.58, vWaveHeight);
-          waterCol = mix(waterCol, vec3(0.75, 0.96, 1.0), crest * 0.32);
+          // Soft painterly wave crest highlight
+          float crest = smoothstep(0.18, 0.45, vWaveHeight);
+          waterCol = mix(waterCol, vec3(0.68, 0.85, 0.89), crest * 0.16);
 
-          // Subtle grid/caustic shimmer
-          float caustic = sin(vWorldPos.x * 0.45 + uTime * 2.0) * sin(vWorldPos.z * 0.45 - uTime * 1.7);
-          waterCol += vec3(0.04, 0.12, 0.16) * smoothstep(0.65, 0.98, caustic);
-
-          // Specular Sun Glitter Trail
+          // Calm specular sun shimmer (capped below bloom threshold)
           vec3 halfVec = normalize(uSunDir + viewDir);
-          float spec = pow(max(dot(norm, halfVec), 0.0), 96.0);
-          waterCol += uSunColor * spec * 1.35;
+          float spec = pow(max(dot(norm, halfVec), 0.0), 110.0);
+          waterCol += uSunColor * spec * 0.42;
 
-          // Distance atmospheric fade
           float dist = length(vWorldPos.xz);
           float edgeFade = smoothstep(250.0, 140.0, dist);
 
-          gl_FragColor = vec4(waterCol, 0.92 * edgeFade);
+          gl_FragColor = vec4(waterCol, 0.93 * edgeFade);
         }
       `
     });
@@ -291,31 +285,31 @@ export class World {
     water.position.y = -1.05;
     this.scene.add(water);
 
-    // 2. Sculpted Multi-Layered Islands (Genshin Stylized Emerald Grass + Craggy Rock Cliffs + Shoreline Foam)
+    // 2. Mondstadt Meadow Islands (Calm Sage-Olive Grass, Warm Pebble Shore & Weathered Limestone Cliffs)
     const grassMat = new THREE.MeshStandardMaterial({
-      color: 0x10b981,
-      roughness: 0.68,
-      metalness: 0.05,
+      color: 0x5c8d53, // Calm Mondstadt Meadow Green
+      roughness: 0.78,
+      metalness: 0.02,
       flatShading: true
     });
 
     const sandMat = new THREE.MeshStandardMaterial({
-      color: 0xfde68a,
-      roughness: 0.82,
+      color: 0xd6c4a2, // Warm natural sand/pebble shore
+      roughness: 0.88,
       flatShading: true
     });
 
     const rockMat = new THREE.MeshStandardMaterial({
-      color: 0x334155,
-      roughness: 0.85,
-      metalness: 0.12,
+      color: 0x6c757d, // Weathered Mondstadt Limestone Grey
+      roughness: 0.86,
+      metalness: 0.06,
       flatShading: true
     });
 
     const foamRingMat = new THREE.MeshBasicMaterial({
-      color: 0xe0f2fe,
+      color: 0xcde4f2,
       transparent: true,
-      opacity: 0.55,
+      opacity: 0.26,
       side: THREE.DoubleSide,
       depthWrite: false
     });
@@ -327,7 +321,7 @@ export class World {
       const islandGroup = new THREE.Group();
       islandGroup.position.set(pad.position.x, 0, pad.position.z);
 
-      // Top emerald grass plateau
+      // Top meadow grass plateau
       const topGeo = new THREE.CylinderGeometry(radius, radius * 1.07, 1.05, 18);
       const topMesh = new THREE.Mesh(topGeo, grassMat);
       topMesh.position.y = 0.05;
@@ -335,14 +329,14 @@ export class World {
       topMesh.castShadow = true;
       islandGroup.add(topMesh);
 
-      // Sand beach rim
+      // Warm pebble beach rim
       const sandGeo = new THREE.CylinderGeometry(radius * 1.08, radius * 1.19, 0.78, 18);
       const sandMesh = new THREE.Mesh(sandGeo, sandMat);
       sandMesh.position.y = -0.38;
       sandMesh.receiveShadow = true;
       islandGroup.add(sandMesh);
 
-      // Sculpted craggy rock cliffs underneath (vertex-displaced for organic cliff facets)
+      // Sculpted limestone cliffs underneath
       const rockGeo = new THREE.CylinderGeometry(radius * 1.16, radius * 0.52, 4.8, 16, 3);
       const posAttr = rockGeo.attributes.position;
       for (let v = 0; v < posAttr.count; v++) {
@@ -362,7 +356,7 @@ export class World {
       rockMesh.receiveShadow = true;
       islandGroup.add(rockMesh);
 
-      // Coastal rock boulders around perimeter
+      // Weathered limestone boulders around perimeter
       for (let b = 0; b < 5; b++) {
         const ang = (b / 5) * Math.PI * 2 + idx * 0.7;
         const bDist = radius * (0.95 + (b % 2) * 0.14);
@@ -382,8 +376,8 @@ export class World {
         islandGroup.add(boulder);
       }
 
-      // Animated Shoreline Foam Ring in the water around each island
-      const foamGeo = new THREE.RingGeometry(radius * 1.14, radius * 1.27, 32);
+      // Gentle Shoreline Ripple Ring
+      const foamGeo = new THREE.RingGeometry(radius * 1.14, radius * 1.25, 32);
       foamGeo.rotateX(-Math.PI / 2);
       const foamMesh = new THREE.Mesh(foamGeo, foamRingMat.clone());
       foamMesh.position.y = -0.96;
@@ -397,11 +391,21 @@ export class World {
   }
 
   buildBridges() {
-    const bridgeMat = new THREE.MeshStandardMaterial({
-      color: 0x1e293b,
-      roughness: 0.45,
-      metalness: 0.45,
+    // Mondstadt Carved Stone Masonry Bridges with Parapets & Warm Lanterns
+    const stoneRoadMat = new THREE.MeshStandardMaterial({
+      color: 0x8d8880,
+      roughness: 0.82,
       flatShading: true
+    });
+    const parapetMat = new THREE.MeshStandardMaterial({
+      color: 0xc9c2b8,
+      roughness: 0.75,
+      flatShading: true
+    });
+    const goldInlayMat = new THREE.MeshStandardMaterial({
+      color: 0xc2a878,
+      roughness: 0.45,
+      metalness: 0.35
     });
 
     const connections = [
@@ -415,24 +419,33 @@ export class World {
       const to = HELIPADS[j];
       if (!from || !to) return;
 
-      const vFrom = new THREE.Vector3(from.position.x, 0.2, from.position.z);
-      const vTo = new THREE.Vector3(to.position.x, 0.2, to.position.z);
+      const vFrom = new THREE.Vector3(from.position.x, 0.22, from.position.z);
+      const vTo = new THREE.Vector3(to.position.x, 0.22, to.position.z);
       const dist = vFrom.distanceTo(vTo);
       const mid = vFrom.clone().add(vTo).multiplyScalar(0.5);
 
-      const bridgeGeo = new THREE.BoxGeometry(3.6, 0.36, dist);
-      const bridge = new THREE.Mesh(bridgeGeo, bridgeMat);
-      bridge.position.copy(mid);
-      bridge.lookAt(vTo);
-      bridge.receiveShadow = true;
-      this.scene.add(bridge);
+      const bridgeGroup = new THREE.Group();
+      bridgeGroup.position.copy(mid);
+      bridgeGroup.lookAt(vTo);
 
-      const lineGeo = new THREE.BoxGeometry(0.26, 0.39, dist * 0.9);
-      const lineMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8 });
-      const line = new THREE.Mesh(lineGeo, lineMat);
-      line.position.copy(mid);
-      line.lookAt(vTo);
-      this.scene.add(line);
+      // Cobblestone deck
+      const deck = new THREE.Mesh(new THREE.BoxGeometry(3.5, 0.38, dist), stoneRoadMat);
+      deck.receiveShadow = true;
+      bridgeGroup.add(deck);
+
+      // Left & Right Stone Parapet Walls
+      [-1.62, 1.62].forEach((px) => {
+        const wall = new THREE.Mesh(new THREE.BoxGeometry(0.28, 0.65, dist * 0.65), parapetMat);
+        wall.position.set(px, 0.25, 0);
+        wall.castShadow = true;
+        bridgeGroup.add(wall);
+      });
+
+      // Subtle champagne-gold center masonry strip
+      const inlay = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.4, dist * 0.85), goldInlayMat);
+      bridgeGroup.add(inlay);
+
+      this.scene.add(bridgeGroup);
     });
   }
 
@@ -441,54 +454,56 @@ export class World {
       const padGroup = new THREE.Group();
       padGroup.position.set(padData.position.x, padData.position.y, padData.position.z);
 
-      // 1. Armored Octagonal Landing Deck
-      const deckOuterGeo = new THREE.CylinderGeometry(6.2, 6.8, 0.42, 8);
+      // 1. Mondstadt Carved Stone Plaza Outer Ring
+      const deckOuterGeo = new THREE.CylinderGeometry(6.2, 6.8, 0.42, 12);
       const deckOuterMat = new THREE.MeshStandardMaterial({
-        color: 0x0f172a,
-        roughness: 0.45,
-        metalness: 0.35
+        color: 0xbcb5ab, // Warm carved limestone
+        roughness: 0.72,
+        metalness: 0.08
       });
       const deckOuter = new THREE.Mesh(deckOuterGeo, deckOuterMat);
       deckOuter.receiveShadow = true;
       deckOuter.castShadow = true;
       padGroup.add(deckOuter);
 
-      // Inner Elevated Pad Surface
+      // Inner Slate-Stone Landing Circle
       const deckInnerGeo = new THREE.CylinderGeometry(5.3, 5.5, 0.48, 16);
       const deckInnerMat = new THREE.MeshStandardMaterial({
-        color: 0x1e293b,
-        roughness: 0.5
+        color: 0x333c4a,
+        roughness: 0.65
       });
       const deckInner = new THREE.Mesh(deckInnerGeo, deckInnerMat);
       deckInner.receiveShadow = true;
       padGroup.add(deckInner);
 
-      // 2. High-Visibility Hazard Border Ring
-      const borderGeo = new THREE.RingGeometry(4.85, 5.25, 32);
+      // 2. Genshin Champagne-Gold Ornate Trim Ring
+      const borderGeo = new THREE.RingGeometry(4.85, 5.22, 32);
       borderGeo.rotateX(-Math.PI / 2);
-      const borderMat = new THREE.MeshBasicMaterial({
-        color: 0xfbbf24,
+      const borderMat = new THREE.MeshStandardMaterial({
+        color: 0xd3bc8e,
+        roughness: 0.35,
+        metalness: 0.55,
         side: THREE.DoubleSide
       });
       const border = new THREE.Mesh(borderGeo, borderMat);
       border.position.y = 0.25;
       padGroup.add(border);
 
-      // 3. Glowing Theme Neon Ring
-      const glowGeo = new THREE.RingGeometry(3.6, 4.15, 32);
+      // 3. Calm Theme Accent Ring (Soft opacity, no harsh glare)
+      const glowGeo = new THREE.RingGeometry(3.6, 4.05, 32);
       glowGeo.rotateX(-Math.PI / 2);
       const glowMat = new THREE.MeshBasicMaterial({
         color: padData.accentGlow,
         side: THREE.DoubleSide,
         transparent: true,
-        opacity: 0.95
+        opacity: 0.65
       });
       const glowRing = new THREE.Mesh(glowGeo, glowMat);
       glowRing.position.y = 0.26;
       padGroup.add(glowRing);
 
-      // 4. Center H Marking
-      const hMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+      // 4. Warm Ivory Center H Marking
+      const hMat = new THREE.MeshStandardMaterial({ color: 0xf4efe6, roughness: 0.5 });
       const hLeft = new THREE.Mesh(new THREE.BoxGeometry(0.38, 0.02, 2.5), hMat);
       hLeft.position.set(-0.75, 0.26, 0);
       padGroup.add(hLeft);
@@ -501,55 +516,93 @@ export class World {
       hCross.position.set(0, 0.26, 0);
       padGroup.add(hCross);
 
-      // 5. 4 Corner Illuminated Tactical Pylons
+      // 5. 4 Mondstadt Wrought-Iron & Warm Amber Plaza Lanterns (True point of warm glow!)
+      const ironMat = new THREE.MeshStandardMaterial({ color: 0x2c3038, roughness: 0.5, metalness: 0.6 });
+      const lanternGlowMat = new THREE.MeshStandardMaterial({
+        color: 0xfde68a,
+        emissive: 0xf59e0b,
+        emissiveIntensity: 1.45 // Crosses Bloom threshold 1.06 so ONLY lantern cores softly glow!
+      });
       [[-4.5, -4.5], [4.5, -4.5], [-4.5, 4.5], [4.5, 4.5]].forEach(([lx, lz]) => {
-        const post = new THREE.Mesh(
-          new THREE.BoxGeometry(0.35, 0.85, 0.35),
-          new THREE.MeshStandardMaterial({ color: 0x334155 })
-        );
-        post.position.set(lx, 0.42, lz);
+        const post = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.18, 1.45, 6), ironMat);
+        post.position.set(lx, 0.72, lz);
         post.castShadow = true;
         padGroup.add(post);
 
-        const bulb = new THREE.Mesh(
-          new THREE.SphereGeometry(0.18, 8, 8),
-          new THREE.MeshBasicMaterial({ color: padData.accentGlow })
-        );
-        bulb.position.set(lx, 0.92, lz);
+        const cap = new THREE.Mesh(new THREE.ConeGeometry(0.34, 0.25, 6), ironMat);
+        cap.position.set(lx, 1.65, lz);
+        padGroup.add(cap);
+
+        const bulb = new THREE.Mesh(new THREE.OctahedronGeometry(0.2, 0), lanternGlowMat);
+        bulb.position.set(lx, 1.45, lz);
         padGroup.add(bulb);
       });
 
-      // 6. Crisp Floating 3D Station Signboard
+      // 5b. Genshin-Style Floating Teleport Waypoint Shrine next to each plaza
+      const wpGroup = new THREE.Group();
+      wpGroup.position.set(-6.8, 0.2, -3.8);
+      const wpPedestal = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.65, 0.9, 0.9, 6),
+        deckOuterMat
+      );
+      wpPedestal.position.y = 0.45;
+      wpGroup.add(wpPedestal);
+
+      const wpCrown = new THREE.Mesh(
+        new THREE.OctahedronGeometry(0.55, 0),
+        new THREE.MeshStandardMaterial({
+          color: 0x67e8f9,
+          emissive: 0x0284c7,
+          emissiveIntensity: 1.35 // Selective Bloom on the Waypoint crystal!
+        })
+      );
+      wpCrown.position.y = 1.9;
+      wpCrown.scale.set(0.75, 1.45, 0.75);
+      wpGroup.add(wpCrown);
+      padGroup.add(wpGroup);
+
+      this.animatedLandmarks.push((dt, t) => {
+        wpCrown.rotation.y += dt * 1.2;
+        wpCrown.position.y = 1.9 + Math.sin(t * 2.2 + padData.position.x) * 0.18;
+      });
+
+      // 6. Noble Genshin-Styled Station Signboard (Deep Slate + Champagne Gold #d3bc8e Frame)
       const bannerCanvas = document.createElement('canvas');
       bannerCanvas.width = 640;
       bannerCanvas.height = 180;
       const bCtx = bannerCanvas.getContext('2d');
 
-      // Dark glass background
-      bCtx.fillStyle = 'rgba(9, 9, 11, 0.92)';
+      bCtx.fillStyle = 'rgba(22, 27, 38, 0.94)';
       bCtx.beginPath();
-      bCtx.roundRect(8, 8, 624, 164, 24);
+      bCtx.roundRect(8, 8, 624, 164, 20);
       bCtx.fill();
 
-      bCtx.lineWidth = 5;
-      bCtx.strokeStyle = padData.color;
+      bCtx.lineWidth = 4;
+      bCtx.strokeStyle = '#d3bc8e'; // Genshin UI Gold
+      bCtx.stroke();
+
+      // Inner subtle gold hairline
+      bCtx.lineWidth = 1.5;
+      bCtx.strokeStyle = 'rgba(211, 188, 142, 0.35)';
+      bCtx.beginPath();
+      bCtx.roundRect(16, 16, 608, 148, 14);
       bCtx.stroke();
 
       // Top badge line
-      bCtx.font = '600 24px Inter, sans-serif';
-      bCtx.fillStyle = padData.color;
+      bCtx.font = '600 22px Inter, sans-serif';
+      bCtx.fillStyle = '#d3bc8e';
       bCtx.textAlign = 'center';
-      bCtx.fillText(`ЛОКАЦИЯ ${padData.number} · ${padData.badge.toUpperCase()}`, 320, 48);
+      bCtx.fillText(`✦ ЛОКАЦИЯ ${padData.number} · ${padData.badge.toUpperCase()} ✦`, 320, 48);
 
       // Main Title
-      bCtx.font = 'bold 44px Inter, sans-serif';
-      bCtx.fillStyle = '#ffffff';
-      bCtx.fillText(`${padData.emoji} ${padData.shortTitle}`, 320, 105);
+      bCtx.font = 'bold 42px Inter, sans-serif';
+      bCtx.fillStyle = '#f4efe6';
+      bCtx.fillText(`${padData.emoji} ${padData.shortTitle}`, 320, 104);
 
       // Subtitle hint
-      bCtx.font = '500 20px Inter, sans-serif';
+      bCtx.font = '500 19px Inter, sans-serif';
       bCtx.fillStyle = '#94a3b8';
-      bCtx.fillText(padData.category, 320, 145);
+      bCtx.fillText(padData.category, 320, 144);
 
       const bannerTex = new THREE.CanvasTexture(bannerCanvas);
       const bannerSprite = new THREE.Sprite(
@@ -993,59 +1046,110 @@ export class World {
 
   buildVegetation() {
     const trunkMat = new THREE.MeshStandardMaterial({
-      color: 0x78350f,
+      color: 0x5c4028,
       roughness: 0.9,
       flatShading: true
     });
-    const foliageColors = [0x15803d, 0x16a34a, 0x059669];
+    // Calm Mondstadt foliage colors: sage green, forest olive, and warm golden birch
+    const foliageColors = [0x4f7f48, 0x629055, 0x456e40, 0xb89246];
+
+    // Materials for Mondstadt Tudor Cottages
+    const plasterMat = new THREE.MeshStandardMaterial({ color: 0xf3ede2, roughness: 0.8 });
+    const timberMat = new THREE.MeshStandardMaterial({ color: 0x4a3525, roughness: 0.85 });
+    const roofMat = new THREE.MeshStandardMaterial({ color: 0xb4533c, roughness: 0.72, flatShading: true });
+    const windowMat = new THREE.MeshStandardMaterial({
+      color: 0xfde68a,
+      emissive: 0xf59e0b,
+      emissiveIntensity: 1.35 // Warm glowing cottage window!
+    });
 
     HELIPADS.forEach((pad, idx) => {
-      const treeCount = pad.id === 'hq' ? 10 : 6;
+      const treeCount = pad.id === 'hq' ? 9 : 6;
       for (let i = 0; i < treeCount; i++) {
-        // Place trees along the left/back perimeter away from the landmark and pad
-        const angle = (i / treeCount) * Math.PI * 1.3 + 1.2;
-        const dist = 8.8 + (i % 3) * 2.2;
+        const angle = (i / treeCount) * Math.PI * 1.3 + 1.25;
+        const dist = 9.0 + (i % 3) * 2.3;
         const tx = pad.position.x + Math.cos(angle) * dist;
         const tz = pad.position.z + Math.sin(angle) * dist;
 
         const treeGroup = new THREE.Group();
         treeGroup.position.set(tx, 0.5, tz);
-        const s = 0.75 + ((i + idx) % 3) * 0.2;
+        const s = 0.8 + ((i + idx) % 3) * 0.22;
         treeGroup.scale.set(s, s, s);
 
-        const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.25, 1.2, 6), trunkMat);
-        trunk.position.y = 0.6;
+        const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.28, 1.5, 6), trunkMat);
+        trunk.position.y = 0.75;
         trunk.castShadow = true;
         treeGroup.add(trunk);
 
         const foliageMat = new THREE.MeshStandardMaterial({
           color: foliageColors[(i + idx) % foliageColors.length],
-          roughness: 0.7,
+          roughness: 0.78,
           flatShading: true
         });
 
-        for (let j = 0; j < 3; j++) {
-          const cone = new THREE.Mesh(
-            new THREE.ConeGeometry(1.25 - j * 0.26, 1.2 - j * 0.12, 6),
-            foliageMat
-          );
-          cone.position.y = 1.3 + j * 0.65;
-          cone.castShadow = true;
-          treeGroup.add(cone);
-        }
+        // Painterly rounded canopy puffs (Genshin style)
+        const canopyPositions = [
+          { x: 0, y: 2.1, z: 0, r: 1.25 },
+          { x: -0.6, y: 1.75, z: 0.4, r: 0.9 },
+          { x: 0.65, y: 1.8, z: -0.35, r: 0.95 },
+          { x: 0, y: 2.75, z: 0.1, r: 0.85 }
+        ];
+        canopyPositions.forEach((cp) => {
+          const puff = new THREE.Mesh(new THREE.DodecahedronGeometry(cp.r, 1), foliageMat);
+          puff.position.set(cp.x, cp.y, cp.z);
+          puff.castShadow = true;
+          puff.receiveShadow = true;
+          treeGroup.add(puff);
+        });
 
         this.scene.add(treeGroup);
+      }
+
+      // Add a charming Mondstadt Tudor Cottage on the left/back side of each island
+      if (idx % 2 === 0) {
+        const houseGroup = new THREE.Group();
+        houseGroup.position.set(pad.position.x - 9.2, 0.5, pad.position.z + 4.2);
+        houseGroup.rotation.y = 0.55;
+
+        const walls = new THREE.Mesh(new THREE.BoxGeometry(3.2, 2.5, 2.6), plasterMat);
+        walls.position.y = 1.25;
+        walls.castShadow = true;
+        walls.receiveShadow = true;
+        houseGroup.add(walls);
+
+        // Timber framing beams
+        const beamH = new THREE.Mesh(new THREE.BoxGeometry(3.26, 0.16, 2.66), timberMat);
+        beamH.position.y = 1.3;
+        houseGroup.add(beamH);
+
+        // Pitched Terracotta Roof
+        const roofGeo = new THREE.ConeGeometry(2.65, 1.9, 4);
+        roofGeo.rotateY(Math.PI / 4);
+        const roof = new THREE.Mesh(roofGeo, roofMat);
+        roof.position.y = 3.4;
+        roof.scale.set(1.15, 1.0, 0.95);
+        roof.castShadow = true;
+        houseGroup.add(roof);
+
+        // Warm lit cottage windows
+        [-0.8, 0.8].forEach((wx) => {
+          const win = new THREE.Mesh(new THREE.PlaneGeometry(0.55, 0.7), windowMat);
+          win.position.set(wx, 1.4, 1.32);
+          houseGroup.add(win);
+        });
+
+        this.scene.add(houseGroup);
       }
     });
   }
 
   buildSwayingGrass() {
-    // Genshin-style wind-swaying grass blades across all islands using InstancedMesh
-    const bladeGeo = new THREE.ConeGeometry(0.14, 0.75, 4);
+    // Calm Mondstadt sage-green wind-swaying grass blades
+    const bladeGeo = new THREE.ConeGeometry(0.14, 0.72, 4);
     bladeGeo.translate(0, 0.35, 0);
     const bladeMat = new THREE.MeshStandardMaterial({
-      color: 0x22c55e,
-      roughness: 0.6,
+      color: 0x689a5d,
+      roughness: 0.75,
       flatShading: true
     });
 
@@ -1077,55 +1181,82 @@ export class World {
   }
 
   buildWindmills() {
+    // Classic Mondstadt Medieval Stone & Timber Windmills with 4 Lattice Canvas Sails
     const turbinePositions = [
+      { x: -16, z: -13 }, // Right on the Grand HQ Island!
       { x: -62, z: -5 },
       { x: 62, z: -5 },
       { x: 0, z: -78 }
     ];
 
-    const towerMat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, roughness: 0.3 });
-    const bladeMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.2 });
+    const stoneMat = new THREE.MeshStandardMaterial({ color: 0x8a847c, roughness: 0.85, flatShading: true });
+    const plasterMat = new THREE.MeshStandardMaterial({ color: 0xf3ede2, roughness: 0.75 });
+    const woodMat = new THREE.MeshStandardMaterial({ color: 0x5c3a21, roughness: 0.8 });
+    const roofMat = new THREE.MeshStandardMaterial({ color: 0x3d5a73, roughness: 0.7, flatShading: true });
+    const sailMat = new THREE.MeshStandardMaterial({
+      color: 0xfaf5eb,
+      roughness: 0.65,
+      side: THREE.DoubleSide
+    });
 
     turbinePositions.forEach((pos) => {
       const group = new THREE.Group();
       group.position.set(pos.x, 0, pos.z);
 
-      const tower = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.9, 18, 8), towerMat);
-      tower.position.y = 9;
-      tower.castShadow = true;
-      group.add(tower);
+      // Stone base + Plaster upper tower
+      const base = new THREE.Mesh(new THREE.CylinderGeometry(1.8, 2.4, 7.0, 8), stoneMat);
+      base.position.y = 3.5;
+      base.castShadow = true;
+      group.add(base);
 
-      const nacelle = new THREE.Mesh(new THREE.BoxGeometry(1.2, 1.0, 2.5), towerMat);
-      nacelle.position.set(0, 18, 0);
-      group.add(nacelle);
+      const upper = new THREE.Mesh(new THREE.CylinderGeometry(1.45, 1.8, 8.5, 8), plasterMat);
+      upper.position.y = 11.2;
+      upper.castShadow = true;
+      group.add(upper);
+
+      const roof = new THREE.Mesh(new THREE.ConeGeometry(1.9, 3.2, 8), roofMat);
+      roof.position.y = 17.0;
+      roof.castShadow = true;
+      group.add(roof);
 
       const rotorGroup = new THREE.Group();
-      rotorGroup.position.set(0, 18, -1.3);
+      rotorGroup.position.set(0, 13.8, 1.65);
 
-      for (let b = 0; b < 3; b++) {
-        const bladeGeo = new THREE.ConeGeometry(0.35, 7.5, 4);
-        bladeGeo.rotateZ((b * Math.PI * 2) / 3);
-        const blade = new THREE.Mesh(bladeGeo, bladeMat);
-        blade.position.y = Math.cos((b * Math.PI * 2) / 3) * 3.5;
-        blade.position.x = -Math.sin((b * Math.PI * 2) / 3) * 3.5;
-        rotorGroup.add(blade);
+      const hub = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.4, 1.0, 8), woodMat);
+      hub.rotation.x = Math.PI / 2;
+      rotorGroup.add(hub);
+
+      for (let b = 0; b < 4; b++) {
+        const armGroup = new THREE.Group();
+        armGroup.rotation.z = (b * Math.PI) / 2;
+
+        const spar = new THREE.Mesh(new THREE.BoxGeometry(0.18, 7.2, 0.18), woodMat);
+        spar.position.y = 3.6;
+        armGroup.add(spar);
+
+        const sail = new THREE.Mesh(new THREE.BoxGeometry(1.35, 5.8, 0.04), sailMat);
+        sail.position.set(0.45, 4.1, 0.06);
+        sail.castShadow = true;
+        armGroup.add(sail);
+
+        rotorGroup.add(armGroup);
       }
 
       group.add(rotorGroup);
       this.scene.add(group);
 
-      this.turbines.push({ rotor: rotorGroup, speed: 1.0 });
+      this.turbines.push({ rotor: rotorGroup, speed: 0.75 });
     });
   }
 
   buildCollectibleStars() {
     const starGeo = new THREE.OctahedronGeometry(0.95, 0);
     const starMat = new THREE.MeshStandardMaterial({
-      color: 0xfbbf24,
-      roughness: 0.15,
-      metalness: 0.9,
+      color: 0xfde68a,
+      roughness: 0.2,
+      metalness: 0.8,
       emissive: 0xf59e0b,
-      emissiveIntensity: 0.65
+      emissiveIntensity: 1.25 // Selective glow just on the stars!
     });
 
     COLLECTIBLE_STARS.forEach((starData) => {
@@ -1155,11 +1286,11 @@ export class World {
 
   buildClouds() {
     const cloudMat = new THREE.MeshStandardMaterial({
-      color: 0xffffff,
-      roughness: 0.85,
+      color: 0xeaeef2, // Soft off-white so clouds NEVER trigger bloom glare
+      roughness: 0.92,
       flatShading: true,
       transparent: true,
-      opacity: 0.86
+      opacity: 0.84
     });
 
     for (let c = 0; c < 16; c++) {
