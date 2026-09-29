@@ -1,233 +1,402 @@
 export const PORTFOLIO_INFO = {
-  author: "Дмитрий (Burger)",
-  role: "Lead Designer & Product Lead",
-  status: "Available for Projects",
+  author: "Дмитрий Бургер",
+  role: "Product-Oriented Frontend Engineer & UI/UX Lead",
+  status: "Открыт к проектам и предложениям",
+  location: "Москва / Remote",
   telegram: "https://t.me/aimovl",
   github: "https://github.com/228burger228",
-  avatar: "./assets/images/Burgerlogo.jpg",
-  tagline: "Design-Driven Product & Technical Studio · 15+ проектов в проде"
+  youtube: "https://www.youtube.com/@burgerdom6",
+  studioBot: "https://t.me/dmitryB_studio_bot",
+  portfolioUrl: "https://228burger228.github.io/burgerportfolio2.0/",
+  avatar: "./assets/mefoto.jpg",
+  tagline: "Собираю хаос требований в работающую систему · Lighthouse 95+ · 15+ проектов в проде"
 };
 
 export const HELIPADS = [
   {
     id: "hq",
-    number: "0",
-    name: "Главная База",
-    shortTitle: "База Дмитрия",
-    category: "Старт / Обо мне",
-    badge: "HQ",
-    color: "#6366f1",
-    accentGlow: 0x6366f1,
+    number: "01",
+    name: "Штаб · Главная",
+    shortTitle: "Штаб (Обо мне)",
+    themeType: "hq",
+    category: "Product Frontend & UI/UX Lead",
+    badge: "Открыт к проектам",
+    color: "#3b82f6",
+    accentGlow: 0x3b82f6,
     position: { x: 0, y: 0.5, z: 0 },
-    cameraOffset: { x: 0, y: 16, z: 24 },
     emoji: "🚁",
-    title: "Дмитрий (Burger) — Lead Designer & Product Lead",
-    subtitle: "Создаю цифровые продукты от концепта до production",
-    description: "Координирую дизайнеров, разработчиков и стейкхолдеров. Превращаю хаос в продуманные цифровые системы и сильный UX. В портфолио — 15+ проектов в проде, государственные платформы, коммерческий e-commerce, мобильные сервисы и игровое комьюнити.",
-    tags: ["Product Design", "Design Systems", "Team Lead", "UX Research", "Figma", "Web Architecture"],
-    stats: [
-      { label: "Проектов в проде", value: "15+" },
-      { label: "Lighthouse Score", value: "95+" },
-      { label: "Опыт", value: "Design & Tech" }
+    title: "Дмитрий Бургер — Product-Oriented Frontend Engineer & UI/UX Lead",
+    subtitle: "Собираю хаос требований в работающую систему. Устраняю разрыв между дизайном и разработкой.",
+    description: "Помогаю бизнесу и стартапам переводить сложные задачи в понятные, стабильные веб-продукты. Проектирую интерфейсы в Figma и реализую их на чистом фронтенд-стеке и Vue 3 с фокусом на конверсию, скорость (Lighthouse 95+) и надежность.",
+    caseFlow: {
+      was: "Разрыв между дизайном и версткой, затянутый Time-to-Market и медленные сайты, теряющие мобильный трафик.",
+      result: "Экономия до 40% времени на доработках, запуск MVP за 2–4 недели, загрузка до 1 секунды (Lighthouse 95+).",
+      became: "Единый цикл: UX/UI Архитектура в Figma + Frontend Инженерия (HTML5/CSS3/JS/Vue 3) + Product Delivery."
+    },
+    tags: [
+      "UX/UI Архитектура", "Frontend Engineering", "Product Delivery",
+      "Vue 3 & Vite", "Figma & Design Systems", "Semantic HTML5 / CSS3",
+      "Cloudflare Workers", "Gemini API", "Supabase", "Lighthouse 95+"
     ],
-    linkText: "Написать в Telegram",
+    stats: [
+      { label: "В production", value: "15+ проектов" },
+      { label: "Скорость Lighthouse", value: "95+" },
+      { label: "Аудитория проектов", value: "10 000+ / мес" },
+      { label: "Соблюдение сроков", value: "100%" }
+    ],
+    linkText: "Обсудить проект в Telegram",
     link: "https://t.me/aimovl",
-    secondaryLinkText: "GitHub профиль",
+    secondaryLinkText: "Профиль GitHub",
     secondaryLink: "https://github.com/228burger228",
-    image: "./assets/images/Burgerlogo.jpg"
-  },
-  {
-    id: "masterscity",
-    number: "1",
-    name: "Город Мастеров",
-    shortTitle: "Город Мастеров",
-    category: "Game / EdTech",
-    badge: "Гос. проект",
-    color: "#4f46e5",
-    accentGlow: 0x4f46e5,
-    position: { x: -38, y: 0.5, z: -32 },
-    cameraOffset: { x: -38, y: 16, z: -8 },
-    emoji: "🏛️",
-    title: "Город Мастеров — Образовательная игровая платформа",
-    subtitle: "Проект для Департамента образования Москвы",
-    description: "Комплексная образовательно-игровая платформа. Верстал макет и писал весь фронтенд-код — от концептуального дизайна до финального деплоя. Реализовал систему авторизации, профили пользователей, трекинг игровых достижений, кастомную темную тему, смену шрифтов для доступности и интерактивную канбан-доску.",
-    tags: ["HTML5/JS", "Figma", "Gamification", "Dark Theme", "Kanban", "State Management", "EdTech"],
-    stats: [
-      { label: "Клиент", value: "ДепОбр Москвы" },
-      { label: "Роль", value: "Design + Dev" },
-      { label: "Статус", value: "В проде" }
-    ],
-    linkText: "Открыть платформу",
-    link: "https://masterscitygame.ru",
-    image: "./assets/Porfolscr.png"
+    image: "./assets/mefoto.jpg",
+    gallery: [
+      { src: "./assets/mefoto.jpg", caption: "Дмитрий Бургер — Product-Oriented Frontend Engineer & UI/UX Lead" },
+      { src: "./assets/mefoto2.jpg", caption: "Работа над архитектурой цифровых продуктов" },
+      { src: "./assets/hgstroyblag.png", caption: "Официальное благодарственное письмо от ООО «Хаус Гард»" }
+    ]
   },
   {
     id: "hgstroy",
-    number: "2",
-    name: "HgStroy",
-    shortTitle: "HgStroy",
-    category: "Corporate / Web",
-    badge: "Корпоративный портал",
+    number: "02",
+    name: "HgStroy · B2B Портал",
+    shortTitle: "HgStroy B2B",
+    themeType: "construction",
+    category: "Featured · Frontend & Design System",
+    badge: "Team Lead · B2B",
     color: "#f97316",
     accentGlow: 0xf97316,
-    position: { x: 38, y: 0.5, z: -35 },
-    cameraOffset: { x: 38, y: 16, z: -11 },
+    position: { x: -36, y: 0.5, z: -28 },
     emoji: "🏗️",
-    title: "HgStroy — Комплексный сайт строительной компании",
-    subtitle: "Полный редизайн, архитектура и фронтенд для компании «Хаус Гард»",
-    description: "Разработка многоуровневого портала строительной компании. Проработал модульную архитектуру шапки для всей сети подсайтов, сквозной адаптивный дизайн, карусели реализованных объектов, конверсионные формы захвата и интеграцию с CRM. Подготовил техническую документацию для миграции на Next.js.",
-    tags: ["UI/UX", "Design System", "Bootstrap 5", "CRM Integration", "Swiper", "Responsive"],
+    title: "HgStroy — Корпоративный B2B-портал строительной компании",
+    subtitle: "Редизайн и фронтенд-архитектура для компании «Хаус Гард» (2025)",
+    description: "Руководил связкой дизайна и верстки в команде из 2 человек. Спроектировал модульную дизайн-систему, адаптивные компоненты, формы захвата заявок и провел интеграцию с корпоративным сервером заказчика. Получено официальное благодарственное письмо от руководства компании.",
+    caseFlow: {
+      was: "Устаревший сайт без адаптива, потеря мобильного трафика и заявок.",
+      result: "Загрузка в 2.4 раза быстрее (Lighthouse 95+), сайт летает на смартфонах, благодарность руководства.",
+      became: "Модульная B2B-система, чистый код и конверсионная воронка лидов."
+    },
+    tags: ["Team Coordination", "UI/UX Design System", "Bootstrap 5", "Figma", "Lighthouse 95+", "B2B Portal"],
     stats: [
-      { label: "Компания", value: "HgStroy" },
-      { label: "Формат", value: "Multi-page" },
-      { label: "Конверсия", value: "+38%" }
+      { label: "Роль", value: "Lead Frontend & Designer" },
+      { label: "Ускорение", value: "в 2.4 раза" },
+      { label: "Награда", value: "Благодарность ООО «Хаус Гард»" }
     ],
-    linkText: "Смотреть сайт HgStroy",
+    linkText: "Открыть сайт HgStroy ↗",
     link: "https://smr.hgstroy.ru/index.html",
-    image: "./assets/images/hgstroyblag.png"
+    image: "./assets/hgstroy.png",
+    gallery: [
+      { src: "./assets/hgstroy.png", caption: "HgStroy — Главный экран корпоративного портала" },
+      { src: "./assets/hgsmr.png", caption: "Модульная сетка и подразделы строительной компании" },
+      { src: "./assets/hgstroyblag.png", caption: "Официальное благодарственное письмо от ООО «Хаус Гард»" }
+    ]
   },
   {
     id: "warpath",
-    number: "3",
+    number: "03",
     name: "Warpath Wiki",
     shortTitle: "Warpath Wiki",
-    category: "Gaming / Community",
-    badge: "Официальное партнёрство",
+    themeType: "military",
+    category: "Featured · High-Load Vue 3 SPA",
+    badge: "⭐ 10 000+ MAU",
     color: "#ef4444",
     accentGlow: 0xef4444,
-    position: { x: 45, y: 0.5, z: 28 },
-    cameraOffset: { x: 45, y: 16, z: 52 },
+    position: { x: 36, y: 0.5, z: -28 },
     emoji: "⚔️",
-    title: "Warpath: Ace Shooter Wiki",
-    subtitle: "Главная база знаний для русскоязычного комьюнити мобильной стратегии",
-    description: "Интерактивный справочник в официальном партнерстве с разработчиками игры. База охватывает полную базу юнитов, офицеров, экипировки, расчеты урона и механики боев. Закрывает информационную нишу для сотен тысяч игроков, которую не покрывают англоязычные и китайские ресурсы.",
-    tags: ["Vue 3", "Vite", "Design System", "Gaming UI", "Data Architecture", "GitHub Pages"],
+    title: "Warpath: Ace Shooter Wiki — Справочник сообщества",
+    subtitle: "Официальный ресурс-партнёр игры · Product & Frontend Developer (2024 — сейчас)",
+    description: "Высоконагруженный веб-справочник русскоязычного комьюнити мобильной стратегии. Разработал архитектуру на Vue 3, Vite и Supabase, реализовал мгновенный поиск, фильтрацию и SEO-оптимизацию.",
+    caseFlow: {
+      was: "Данные разбросаны по чатам и таблицам, высокий барьер входа для новичков.",
+      result: "10 000+ активных игроков в месяц, официальное партнёрство с игрой, топ-1 в Яндексе и Google.",
+      became: "Быстрый SPA-справочник с фильтрацией, базой юнитов, офицеров и базой данных."
+    },
+    tags: ["Vue 3", "Vite", "Supabase", "SEO & a11y", "High-Load", "10 000+ MAU"],
     stats: [
-      { label: "Партнёр", value: "Warpath" },
-      { label: "Технологии", value: "Vue 3 + Vite" },
-      { label: "Аудитория", value: "RU Community" }
+      { label: "Трафик", value: "10 000+ чел/мес" },
+      { label: "Стек", value: "Vue 3 + Supabase" },
+      { label: "Статус", value: "Офиц. партнёр" }
     ],
-    linkText: "Перейти в Wiki",
+    linkText: "Открыть Warpath Wiki ↗",
     link: "https://228burger228.github.io/WarpathYTwiki/index.html",
+    secondaryLinkText: "WP Commander ↗",
+    secondaryLink: "https://wpcommander.netlify.app",
     image: "./assets/warpathwikiscrin.png"
   },
   {
-    id: "ecostep",
-    number: "4",
-    name: "Eco-Step",
-    shortTitle: "Eco-Step App",
-    category: "Mobile UI / Concept",
-    badge: "App Design",
-    color: "#10b981",
-    accentGlow: 0x10b981,
-    position: { x: -42, y: 0.5, z: 32 },
-    cameraOffset: { x: -42, y: 16, z: 56 },
-    emoji: "🌱",
-    title: "Eco-Step — Мобильное приложение для эко-транспорта",
-    subtitle: "Экосистема для велосипедистов и пользователей микромобильности",
-    description: "Интерфейс мобильного приложения: умная прокладка безопасных веломаршрутов, GPS-трекинг, учет сэкономленных выбросов CO2, геймифицированная система наград и социальное комьюнити единомышленников.",
-    tags: ["Mobile UI", "Figma", "iOS Guidelines", "Gamification", "App Architecture"],
-    stats: [
-      { label: "Тип", value: "Mobile Concept" },
-      { label: "Инструмент", value: "Figma" },
-      { label: "Стиль", value: "Clean Green" }
+    id: "youtube",
+    number: "04",
+    name: "YouTube @burgerdom6 & Hub",
+    shortTitle: "YouTube & Hub",
+    themeType: "youtube",
+    category: "Media · Community · Product QA",
+    badge: "📺 48 500+ просмотров",
+    color: "#ff0033",
+    accentGlow: 0xff0033,
+    position: { x: 58, y: 0.5, z: -2 },
+    emoji: "📺",
+    title: "YouTube @burgerdom6, WarpathHub & WP Commander",
+    subtitle: "Канал с 2019 г. · Объединение ютуберов · Продуктовый консалтинг и тестирование WP Commander",
+    description: "Авторский YouTube-канал @burgerdom6 (139 видео, 48 506 просмотров, 478 подписчиков) и экосистема сообщества Warpath: Ace Shooter. Вместе с другими профильными ютуберами развиваем объединённое комьюнити в Telegram (t.me/WarpathHub), помогаем игрокам и общаемся. Параллельно участвую в разработке, QA-тестировании и проектировании огромной структуры международного портала WP Commander совместно с разработчиком Rogério Mattos.",
+    youtubeInfo: {
+      handle: "@burgerdom6",
+      channelUrl: "https://www.youtube.com/@burgerdom6",
+      registered: "20 янв. 2019 г.",
+      subscribers: "478",
+      videos: "139 видео",
+      views: "48 506 просмотров",
+      latestVideoUrl: "https://youtu.be/yGm-8Lvq5jE?si=7lnqdm2eheAKcITx",
+      latestVideoId: "yGm-8Lvq5jE",
+      avatar: "./assets/youtube-avatar.png",
+      communityUrl: "https://t.me/WarpathHub",
+      wpCommanderUrl: "https://wpcommander.netlify.app",
+      wpDeveloper: "Rogério Mattos"
+    },
+    caseFlow: {
+      was: "Разрозненное комьюнити игроков и нехватка структурированных гайдов, тестов механик и аналитических платформ.",
+      result: "48 506+ просмотров и 139 видео на YouTube, живое объединение ютуберов t.me/WarpathHub и релиз глобальной базы WP Commander.",
+      became: "Мощная связка: авторский YouTube-канал + комьюнити-хаб + продуктовый консалтинг и QA международного сайта."
+    },
+    tags: [
+      "YouTube @burgerdom6", "48 506 просмотров", "139 видео",
+      "t.me/WarpathHub", "WP Commander QA & Product", "Collab w/ Rogério Mattos", "Warpath: Ace Shooter"
     ],
-    linkText: "Открыть макет в Figma",
-    link: "https://www.figma.com/design/2u0JYeK7QvPeYxCvcYyHtL/ecostep",
-    image: "./assets/ecostep.png"
+    stats: [
+      { label: "Подписчиков", value: "478" },
+      { label: "Видео на канале", value: "139 роликов" },
+      { label: "Просмотров", value: "48 506+" },
+      { label: "Основан", value: "20 янв. 2019" }
+    ],
+    linkText: "Канал YouTube @burgerdom6 ↗",
+    link: "https://www.youtube.com/@burgerdom6",
+    secondaryLinkText: "Смотреть последнее видео ▶",
+    secondaryLink: "https://youtu.be/yGm-8Lvq5jE?si=7lnqdm2eheAKcITx",
+    extraLinks: [
+      { text: "💬 TG-комьюнити t.me/WarpathHub", url: "https://t.me/WarpathHub" },
+      { text: "🌐 WP Commander (Dev: Rogério Mattos)", url: "https://wpcommander.netlify.app" }
+    ],
+    image: "./assets/youtube-avatar.png",
+    gallery: [
+      { src: "./assets/youtube-avatar.png", caption: "Фирменная аватарка канала @burgerdom6 (Warpath: Ace Shooter)" },
+      { src: "./assets/warpathwikiscrin.png", caption: "Экосистема проектов по Warpath: Wiki, YouTube и WP Commander" }
+    ]
   },
   {
-    id: "docfrost",
-    number: "5",
-    name: "docFrost",
-    shortTitle: "docFrost",
-    category: "Landing / Lead Gen",
-    badge: "High Conversion",
+    id: "studyup",
+    number: "05",
+    name: "Study Up & EdTech",
+    shortTitle: "Study Up & EdTech",
+    themeType: "edtech",
+    category: "Featured · EdTech & MVP Platforms",
+    badge: "👥 Team Lead · MVP",
+    color: "#6366f1",
+    accentGlow: 0x6366f1,
+    position: { x: -42, y: 0.5, z: 22 },
+    emoji: "🎓",
+    title: "Study Up, SkillForge & Город Мастеров — Образовательные платформы",
+    subtitle: "Запуск EdTech-продуктов от UX-концепции до рабочего MVP на Vue 3 и JS",
+    description: "Серия образовательных веб-платформ: продуктовое лидирование запуска онлайн-школы Study Up за 3 недели, разработка SPA-платформы SkillForge на Vue 3 с личным кабинетом и геймифицированная платформа «Город Мастеров» для Департамента образования Москвы.",
+    caseFlow: {
+      was: "Идеи образовательных платформ без единого UX-дизайна и синхронизации между макетами и кодом.",
+      result: "Запуск Study Up за 3 недели (приём первого потока), интерактивный кабинет SkillForge на Vue 3 и внедрение «Города Мастеров».",
+      became: "Готовая UX-архитектура, согласованный роадмап, система трекинга прогресса и геймификация."
+    },
+    tags: ["Product Lead", "Vue 3 & Vite", "UX/UI Design", "Team Coordination", "MVP Launch", "EdTech"],
+    stats: [
+      { label: "Study Up", value: "Релиз за 3 недели" },
+      { label: "SkillForge", value: "SPA на Vue 3" },
+      { label: "Город Мастеров", value: "Гос. заказ Москвы" }
+    ],
+    linkText: "Открыть Study Up ↗",
+    link: "https://228burger228.github.io/StudyUp/index.html",
+    secondaryLinkText: "Открыть SkillForge ↗",
+    secondaryLink: "https://228burger228.github.io/SkillForge/",
+    image: "./assets/Stydy-upLog.jpg",
+    gallery: [
+      { src: "./assets/Stydy-upLog.jpg", caption: "Study Up — Цифровая платформа онлайн-школы (Team Lead)" },
+      { src: "./assets/skillforge.png", caption: "SkillForge — Образовательный SPA-сервис на Vue 3" },
+      { src: "./assets/midquest.png", caption: "Город Мастеров — Образовательная платформа (Гос. заказ)" }
+    ]
+  },
+  {
+    id: "vertical",
+    number: "06",
+    name: "vertical.team",
+    shortTitle: "vertical.team",
+    themeType: "media",
+    category: "Featured · High-Conversion Landing",
+    badge: "🚀 High Conversion",
+    color: "#ec4899",
+    accentGlow: 0xec4899,
+    position: { x: 42, y: 0.5, z: 28 },
+    emoji: "🎬",
+    title: "vertical.team — Платформа AI-креаторов и вертикальных видео",
+    subtitle: "Frontend Developer & Designer (2026) · Чистый стек без тяжёлых библиотек",
+    description: "Разработка конверсионного 8-секционного лендинга с нуля без сторонних библиотек. Спроектировал UI-компоненты, реализовал кастомные touch/drag слайдеры, анимации появления контента, аккордеоны FAQ и строгую семантику от 320px до 2560px.",
+    caseFlow: {
+      was: "Тяжёлые конструкторы тормозили мобильный трафик и роняли конверсию заявок.",
+      result: "Мгновенный запуск на смартфонах, плавная работа 60fps без зависаний и рост входящих заявок.",
+      became: "Лёгкий нативный интерфейс, кастомные touch-слайдеры, безупречный адаптив и доступность WCAG."
+    },
+    tags: ["HTML5", "CSS3", "Vanilla JS", "Motion UI", "Touch Sliders", "WCAG Responsive"],
+    stats: [
+      { label: "Архитектура", value: "8 секций (Zero-deps)" },
+      { label: "Адаптив", value: "320px — 2560px" },
+      { label: "Фокус", value: "Мобильный трафик" }
+    ],
+    linkText: "Открыть vertical.team ↗",
+    link: "https://228burger228.github.io/aNdreyTT/",
+    image: "./assets/verticalteam.png"
+  },
+  {
+    id: "dmitryos",
+    number: "07",
+    name: "Dmitry OS · AI Agent",
+    shortTitle: "Dmitry OS (AI)",
+    themeType: "ai",
+    category: "Featured · Serverless AI & Automation",
+    badge: "🤖 AI Automation",
     color: "#06b6d4",
     accentGlow: 0x06b6d4,
-    position: { x: -5, y: 0.5, z: -58 },
-    cameraOffset: { x: -5, y: 16, z: -34 },
-    emoji: "❄️",
-    title: "docFrost — Сервис вызова мастера и подбора запчастей",
-    subtitle: "Лидогенерирующий лендинг с высокой конверсией",
-    description: "Продуманная посадочная страница с калькулятором стоимости ремонта, системой быстрого вызова мастера и модулем заказа деталей. Структура выстроена на психологических триггерах доверия, что позволило кратно увеличить конверсию из клика в звонок.",
-    tags: ["Lead Magnet", "High Conversion", "UX Copywriting", "HTML/CSS/JS", "Mobile-First"],
+    position: { x: 0, y: 0.5, z: -52 },
+    emoji: "🤖",
+    title: "Dmitry OS Agent v6.0 — Интеллектуальный AI-ассистент в Telegram",
+    subtitle: "Backend Developer & AI Architect · Cloudflare Workers + Gemini API + Google API",
+    description: "Serverless AI-агент автоматизации задач и рабочих процессов. Заменяет связку из календаря, заметочника и трекера задач через один Telegram-чат: распознаёт голосовые сообщения в Google Docs, анализирует дизайн через Gemini Vision, управляет расписанием Google Calendar и шлёт умные пуш-сводки.",
+    caseFlow: {
+      was: "Потери времени на ручную сортировку задач, переключение между 5 приложениями и ручную запись голосовых.",
+      result: "Отклик ассистента 300–800ms (нулевой cold start), экономия часов рутины в неделю и $0/мес на серверы.",
+      became: "Автономный edge-ассистент на Cloudflare Workers + 2 проекта Google Apps Script + кэш в Cloudflare KV."
+    },
+    tags: ["Cloudflare Workers", "Gemini API", "Google Apps Script", "Telegram Bot API", "Calendar & Docs API", "Serverless"],
     stats: [
-      { label: "Тип", value: "Landing Page" },
-      { label: "Фокус", value: "Лидогенерация" },
-      { label: "Результат", value: "Высокий CTR" }
+      { label: "Отклик (Latency)", value: "300–800 ms" },
+      { label: "Инфраструктура", value: "$0 / месяц" },
+      { label: "Uptime", value: "99.9% Edge" }
     ],
-    linkText: "Посмотреть сайт",
-    link: "https://228burger228.github.io/docFrost/",
-    image: "./assets/frosTscrin.png"
+    linkText: "Связаться по AI-ботам ↗",
+    link: "https://t.me/aimovl",
+    secondaryLinkText: "Студийный бот @dmitryB_studio_bot",
+    secondaryLink: "https://t.me/dmitryB_studio_bot",
+    image: "./assets/portfelDD.png"
   },
   {
-    id: "skills",
-    number: "6",
-    name: "Навыки & Стек",
-    shortTitle: "Навыки & Стек",
-    category: "Компетенции",
-    badge: "Skills & Tech",
+    id: "foodice",
+    number: "08",
+    name: "foodiCE & Garden",
+    shortTitle: "foodiCE & Garden",
+    themeType: "product",
+    category: "Featured · Web Products & E-Commerce",
+    badge: "🍦 Lighthouse 95+",
+    color: "#10b981",
+    accentGlow: 0x10b981,
+    position: { x: -32, y: 0.5, z: 54 },
+    emoji: "🍦",
+    title: "foodiCE, Digital Garden & Dimutri Studio — Веб-сервисы и Промо",
+    subtitle: "Высокоскоростные веб-продукты с оценкой Lighthouse 95+ и FCP < 1s",
+    description: "Подборка быстрых веб-продуктов на чистом стеке: промо-лендинг крафтового мороженого foodiCE с формой предзаказа, персональный архив исследований Digital Garden с мгновенным real-time поиском и парная визитка студии Dimutri & Burger с интеграцией Telegram-бота.",
+    caseFlow: {
+      was: "Медленные шаблонные решения и отсутствие удобной конверсионной витрины или мгновенного поиска.",
+      result: "Оценка скорости Lighthouse 95+, FCP менее 1 секунды, мгновенная фильтрация и заказ в 2 клика.",
+      became: "Семантические веб-приложения со светлой/тёмной темой, валидацией форм и соблюдением стандарта WCAG AA."
+    },
+    tags: ["HTML5 / CSS3", "Vanilla JS", "Lighthouse 95+", "FCP < 1s", "WCAG AA", "Conversion UI"],
+    stats: [
+      { label: "foodiCE", value: "E-Commerce Промо" },
+      { label: "Digital Garden", value: "Real-Time Поиск" },
+      { label: "Dimutri & Burger", value: "Studio + TG Bot" }
+    ],
+    linkText: "Открыть foodiCE ↗",
+    link: "https://228burger228.github.io/foodiCE/",
+    secondaryLinkText: "Открыть Digital Garden ↗",
+    secondaryLink: "https://228burger228.github.io/digital-garden",
+    image: "./assets/foodiCE.png",
+    gallery: [
+      { src: "./assets/foodiCE.png", caption: "foodiCE — Промо-лендинг крафтового мороженого" },
+      { src: "./assets/Garden1.png", caption: "Digital Garden — Скоростной веб-архив исследований" },
+      { src: "./assets/portfelDD.png", caption: "Портфолио Dimutri & Burger — Парная визитка студии" }
+    ]
+  },
+  {
+    id: "design",
+    number: "09",
+    name: "UI/UX, Мерч & 3D",
+    shortTitle: "UI/UX, Мерч & 3D",
+    themeType: "creative",
+    category: "UI/UX · Branding · BIM & 3D",
+    badge: "🎨 Мультидисциплинарность",
     color: "#a855f7",
     accentGlow: 0xa855f7,
-    position: { x: -26, y: 0.5, z: 65 },
-    cameraOffset: { x: -26, y: 16, z: 89 },
-    emoji: "🛠️",
-    title: "Компетенции и профессиональный стек",
-    subtitle: "Гармоничное сочетание продуктового дизайна и технической экспертизы",
-    description: "Управляю полным жизненным циклом продукта. Говорю на одном языке как с бизнесом, так и с разработчиками. Могу спроектировать дизайн-систему в Figma, запрограммировать интерактивный фронтенд и довести решение до продакшена.",
-    tags: [
-      "Figma & Tokens", "UI/UX Architecture", "Product Leadership", "Design Systems",
-      "HTML5 / Modern CSS", "JavaScript / ESNext", "Vue.js & Vite", "Three.js / WebGL",
-      "Telegram Mini Apps", "Bootstrap & Tailwind", "Git / GitHub Pages", "CGI / 3D Basics"
-    ],
+    position: { x: 32, y: 0.5, z: 54 },
+    emoji: "🎨",
+    title: "Корпоративный VPN, Точка Ритма, Мерч BOYS 100% и BIM 3D",
+    subtitle: "От сложных B2B дизайн-систем в Figma до полиграфии, мерча и 3D-реконструкции",
+    description: "Широкий спектр визуальной и инженерной экспертизы: UX/UI архитектура корпоративной VPN-платформы (80+ экранов), стриминг-сервис «Точка ритма» (Яндекс Практикум), фирменный мерч и стикерпак мото-сообщества BOYS 100%, серия плакатов и BIM/3D реконструкция Римского дворика РГБ в Revit и Blender.",
+    caseFlow: {
+      was: "Сложные технические системы без понятного UI и потребность в выверенной визуальной айдентике.",
+      result: "Сокращение времени онбординга в VPN-кабинете в 2 раза, высокая оценка в Яндекс Практикуме, готовые тиражи в печати.",
+      became: "Комплексные дизайн-системы, векторные макеты под шелкографию и точные 3D-модели."
+    },
+    tags: ["Figma Design Systems", "B2B SaaS VPN", "Яндекс Практикум", "Мерч BOYS 100%", "Revit & Blender 3D", "Полиграфия"],
     stats: [
-      { label: "Дизайн", value: "Figma Pro" },
-      { label: "Разработка", value: "Frontend" },
-      { label: "Продукт", value: "End-to-End" }
+      { label: "B2B VPN UI", value: "80+ экранов" },
+      { label: "Образование", value: "МГКЭИТ + Практикум" },
+      { label: "3D & BIM", value: "Revit + Blender" }
     ],
-    linkText: "Написать Дмитрию",
-    link: "https://t.me/aimovl",
-    image: "./assets/midquest.png"
+    linkText: "Смотреть портфолио 2.0 ↗",
+    link: "https://228burger228.github.io/burgerportfolio2.0/",
+    image: "./assets/tochkaritma.png",
+    gallery: [
+      { src: "./assets/tochkaritma.png", caption: "Точка ритма — Интерфейс музыкального стриминг-сервиса (Яндекс Практикум)" },
+      { src: "./assets/100_BOYS.png", caption: "BOYS 100% — Фирменный мерч и стикерпак мото-сообщества" },
+      { src: "./assets/sitikol1.png", caption: "Графический дизайн — Промо-кампании и постеры" },
+      { src: "./assets/poster_ppd.png", caption: "Социальный постер — Безопасность и велодвижение" },
+      { src: "./assets/posterr1.jpg", caption: "Серия графических плакатов #1" },
+      { src: "./assets/rimdvor1.jpg", caption: "Римский дворик РГБ — BIM-моделирование в Revit и 3D в Blender" }
+    ]
   },
   {
     id: "contacts",
-    number: "7",
-    name: "Контакты",
-    shortTitle: "Контакты",
-    category: "Связь",
-    badge: "Contact Me",
-    color: "#ec4899",
-    accentGlow: 0xec4899,
-    position: { x: 30, y: 0.5, z: 68 },
-    cameraOffset: { x: 30, y: 16, z: 92 },
+    number: "10",
+    name: "Калькулятор MVP & Связь",
+    shortTitle: "MVP & Контакты",
+    themeType: "contact",
+    category: "Конфигуратор & Контакты",
+    badge: "⚡ Ответ за 1–2 часа",
+    color: "#eab308",
+    accentGlow: 0xeab308,
+    position: { x: 0, y: 0.5, z: 68 },
     emoji: "📬",
-    title: "Давайте создадим что-то выдающееся вместе!",
-    subtitle: "Открыт для интересных продуктов, дизайн-лидерства и веб-разработки",
-    description: "Ищете сильного Lead дизайнера, продуктового специалиста или разработчика, способного создать эстетичный, быстрый и работающий продукт? Напишите мне в Telegram или загляните на GitHub — обсудим вашу задачу!",
-    tags: ["Telegram @aimovl", "GitHub 228burger228", "Full-Cycle Product", "Design Lead"],
+    title: "Калькулятор запуска MVP и прямая связь",
+    subtitle: "Соберите контур вашей задачи и напишите мне в Telegram — отвечу в течение 1–2 часов",
+    description: "Открыт к продуктовым командам и стартапам (Full-time / Part-time / Project-based), комплексному запуску MVP под ключ и UI/UX аудиту с ускорением фронтенда до зелёной зоны Lighthouse 95+.",
+    hasCalculator: true,
+    tags: ["Telegram @aimovl", "YouTube @burgerdom6", "GitHub 228burger228", "Full-time / Project", "MVP за 2–4 недели"],
     stats: [
       { label: "Telegram", value: "@aimovl" },
-      { label: "Ответ", value: "В течение часа" },
-      { label: "Локация", value: "Москва / Remote" }
+      { label: "Время ответа", value: "1–2 часа" },
+      { label: "Формат", value: "Москва / Remote" }
     ],
-    linkText: "Написать в Telegram (@aimovl)",
+    linkText: "Написать в Telegram (@aimovl) ↗",
     link: "https://t.me/aimovl",
-    secondaryLinkText: "GitHub репозитории",
+    secondaryLinkText: "Открыть GitHub ↗",
     secondaryLink: "https://github.com/228burger228",
-    image: "./assets/images/Burgerlogo.jpg"
+    extraLinks: [
+      { text: "📺 YouTube @burgerdom6", url: "https://www.youtube.com/@burgerdom6" },
+      { text: "💬 WarpathHub TG", url: "https://t.me/WarpathHub" }
+    ],
+    image: "./assets/mefoto3.jpg"
   }
 ];
 
 export const COLLECTIBLE_STARS = [
-  { id: 1, x: -18, y: 2.2, z: -15 },
-  { id: 2, x: 18, y: 2.5, z: -18 },
-  { id: 3, x: 22, y: 3.0, z: -50 },
-  { id: 4, x: -20, y: 2.0, z: -48 },
-  { id: 5, x: 25, y: 2.8, z: 2 },
-  { id: 6, x: -22, y: 2.2, z: 12 },
-  { id: 7, x: 12, y: 2.5, z: 46 },
-  { id: 8, x: -6, y: 3.2, z: 38 },
-  { id: 9, x: 42, y: 2.2, z: -2 },
-  { id: 10, x: 3, y: 4.0, z: 80 }
+  { id: 1, x: -18, y: 2.5, z: -14 },
+  { id: 2, x: 18, y: 2.5, z: -14 },
+  { id: 3, x: 0, y: 3.2, z: -28 },
+  { id: 4, x: -22, y: 2.5, z: 10 },
+  { id: 5, x: 22, y: 2.5, z: 10 },
+  { id: 6, x: 47, y: 2.8, z: -15 },
+  { id: 7, x: 50, y: 2.8, z: 13 },
+  { id: 8, x: -16, y: 2.8, z: 60 },
+  { id: 9, x: 16, y: 2.8, z: 60 },
+  { id: 10, x: 0, y: 3.5, z: 34 }
 ];

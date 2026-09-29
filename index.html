@@ -3,13 +3,20 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Дмитрий (Burger) — 3D Вертолётное Портфолио | Lead Designer & Product Lead</title>
-  <meta name="description" content="Интерактивное 3D-портфолио Дмитрия (Burger). Полетайте на вертолёте по площадкам реальных проектов, исследуйте кейсы и собирайте звёзды!">
-  <link rel="icon" href="./assets/images/Burgerlogo.jpg" type="image/jpeg">
+  <title>Дмитрий Бургер — 3D Боевой Вертолёт · Портфолио 2.0 | Product Frontend & UI/UX Lead</title>
+  <meta name="description" content="Интерактивное 3D-портфолио Дмитрия Бургера (Product-Oriented Frontend Engineer & UI/UX Lead). Быстрый боевой вертолёт, 9 тематических локаций и реальные кейсы!">
+  <link rel="icon" href="./assets/mefoto.jpg" type="image/jpeg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./src/style.css">
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.174.0/build/three.module.js"
+      }
+    }
+  </script>
 </head>
 <body>
 
@@ -24,12 +31,12 @@
       <!-- Left: Profile Pill -->
       <div class="profile-pill">
         <div class="avatar-wrapper">
-          <img src="./assets/images/Burgerlogo.jpg" alt="Дмитрий Burger" class="avatar" />
-          <span class="online-dot" title="Открыт к проектам"></span>
+          <img src="./assets/mefoto.jpg" alt="Дмитрий Бургер" class="avatar" />
+          <span class="online-dot" title="Открыт к проектам и предложениям"></span>
         </div>
         <div class="profile-info">
-          <span class="profile-name">Дмитрий (Burger)</span>
-          <span class="profile-role">Lead Designer &amp; Product Lead</span>
+          <span class="profile-name">Дмитрий Бургер</span>
+          <span class="profile-role">Product Frontend Engineer &amp; UI/UX Lead</span>
         </div>
       </div>
 
@@ -39,38 +46,45 @@
           <span class="pulse-dot"></span> 🚁 Автопилот
         </div>
         <div class="hud-location-tag" id="hud-pad-name">
-          🚁 Главная База
+          🚁 Штаб · Главная
+        </div>
+        <div class="hud-pad-counter" id="hud-pad-counter" title="Номер текущей станции">
+          1 / 10
         </div>
       </div>
 
       <!-- Right: Action Buttons -->
       <div class="top-actions">
-        <div class="hud-stars" id="stars-count" title="Соберите все звёздочки на островах!">
+        <div class="hud-stars" id="stars-count" title="Соберите все 10 звёзд на карте!">
           ⭐ 0 / 10
         </div>
 
-        <button class="hud-btn" id="btn-camera" title="Сменить вид камеры (Клавиша C)">
-          🎥 <span class="btn-text">Следование</span>
+        <button class="hud-btn" id="btn-theme" title="Переключить время суток (День / Ночь)">
+          🌙 <span class="btn-text">Ночь</span>
         </button>
 
-        <button class="hud-btn" id="btn-mute" title="Включить / Выключить звук (Клавиша M)">
-          🔊 <span class="btn-text">Звук: Вкл</span>
+        <button class="hud-btn" id="btn-camera" title="Сменить ракурс камеры (Клавиша C)">
+          <span class="btn-text">🎥 Следование</span>
+        </button>
+
+        <button class="hud-btn" id="btn-mute" title="Включить / Выключить мягкие звуки (Клавиша M)">
+          🔊 <span class="btn-text">Звук</span>
         </button>
 
         <a href="https://t.me/aimovl" target="_blank" rel="noopener noreferrer" class="hud-btn hud-btn--cta" title="Написать Дмитрию в Telegram">
-          ✉ <span class="btn-text">Telegram</span>
+          ✉ <span class="btn-text">Обсудить проект</span>
         </a>
 
-        <button class="hud-btn" id="btn-help" title="Управление и подсказки">
+        <button class="hud-btn" id="btn-help" title="Управление и навигация">
           ❓
         </button>
       </div>
     </header>
 
-    <!-- PROXIMITY PROMPT (Appears when hovering low near a helipad in manual flight) -->
+    <!-- PROXIMITY PROMPT -->
     <div class="proximity-prompt" id="proximity-prompt"></div>
 
-    <!-- TOUCH CONTROLS (Appears on mobile screens) -->
+    <!-- TOUCH CONTROLS (Mobile) -->
     <div class="touch-controls" id="touch-controls">
       <div class="joystick-container" id="joystick-container">
         <div class="joystick-stick" id="joystick-stick"></div>
@@ -81,20 +95,28 @@
       </div>
     </div>
 
-    <!-- BOTTOM NAVIGATION DOCK -->
+    <!-- BOTTOM NAVIGATION DOCK WITH PAGING & SCROLLING -->
     <footer class="bottom-dock">
       <div class="dock-controls-hint">
-        🎮 <strong>Управление:</strong> Кликайте по станциям для автопилота или используйте <span class="key-badge">W</span> <span class="key-badge">A</span> <span class="key-badge">S</span> <span class="key-badge">D</span> / Стрелочки для свободного полёта
+        🎮 <strong>Навигация:</strong> Кликайте прямо по 3D-островам или кнопкам внизу, крутите колёсико мыши или жмите <span class="key-badge">◀ Пред.</span> / <span class="key-badge">След. ▶</span> · Полёт: <span class="key-badge">W</span><span class="key-badge">A</span><span class="key-badge">S</span><span class="key-badge">D</span> + <span class="key-badge">Shift</span>
       </div>
 
       <div class="dock-container">
-        <button class="dock-nav-arrow" id="btn-prev-pad" aria-label="Предыдущий проект" title="Предыдущая площадка">◀</button>
+        <button class="dock-nav-arrow" id="btn-prev-pad" title="Полететь к предыдущей локации">
+          ◀ <span class="btn-text">Пред.</span>
+        </button>
+
+        <button class="dock-scroll-btn" id="btn-scroll-left" title="Пролистнуть список влево">«</button>
         
-        <div class="ribbon-scroll" id="ribbon-buttons">
-          <!-- Dynamically populated from data.js -->
+        <div class="ribbon-scroll" id="ribbon-buttons" title="Крутите колёсико мыши или тяните для прокрутки">
+          <!-- Populated from data.js -->
         </div>
 
-        <button class="dock-nav-arrow" id="btn-next-pad" aria-label="Следующий проект" title="Следующая площадка">▶</button>
+        <button class="dock-scroll-btn" id="btn-scroll-right" title="Пролистнуть список вправо">»</button>
+
+        <button class="dock-nav-arrow" id="btn-next-pad" title="Полететь к следующей локации">
+          <span class="btn-text">След.</span> ▶
+        </button>
       </div>
     </footer>
 
@@ -111,47 +133,39 @@
   <dialog id="help-modal">
     <div class="help-card">
       <div class="help-header">
-        <h3>🚁 Как исследовать портфолио</h3>
+        <h3>🚁 Управление и навигация (Портфолио 2.0)</h3>
         <button class="modal-close-btn" onclick="document.getElementById('help-modal').close()">✕</button>
       </div>
 
       <div class="help-grid">
         <div class="help-item">
-          <div class="help-icon">📍</div>
+          <div class="help-icon">⚡</div>
           <div>
-            <h4>Автопилот (Маршруты)</h4>
-            <p>Нажимайте на любые кнопки проектов в нижней панели. Вертолёт самостоятельно взлетит, долетит по дуге до нужной площадки и откроет карточку с описанием и ссылкой на проект.</p>
+            <h4>Клик по 3D-островам и быстрое листание</h4>
+            <p>Кликайте прямо на любой 3D-остров на карте, выбирайте из 10 станций внизу или жмите <strong>◀ Пред. / След. ▶</strong>. Боевой вертолёт стремительно перелетает между точками за ~1 секунду.</p>
           </div>
         </div>
 
         <div class="help-item">
           <div class="help-icon">🕹️</div>
           <div>
-            <h4>Свободный полёт (Ручной режим)</h4>
-            <p>В любой момент используйте клавиши <span class="key-badge">W</span> <span class="key-badge">A</span> <span class="key-badge">S</span> <span class="key-badge">D</span> или стрелочки. <span class="key-badge">Space</span> — подъём, <span class="key-badge">Shift</span> — ускорение, <span class="key-badge">C</span> — переключение камеры (слежение, изометрия, вид из кабины).</p>
+            <h4>Ручной боевой полёт и режим Ночь/День</h4>
+            <p>Клавиши <span class="key-badge">W</span> <span class="key-badge">A</span> <span class="key-badge">S</span> <span class="key-badge">D</span> или стрелочки — свободный полёт. <span class="key-badge">Shift</span> — форсаж, <span class="key-badge">C</span> — смена ракурса камеры, кнопка <strong>🌙 Ночь</strong> — атмосферная неоновая подсветка островов.</p>
           </div>
         </div>
 
         <div class="help-item">
-          <div class="help-icon">⭐</div>
+          <div class="help-icon">🏛️</div>
           <div>
-            <h4>Сбор звёздочек</h4>
-            <p>На островах и между мостами спрятано 10 золотых звёзд. Попробуйте найти и собрать их все в ручном режиме полёта!</p>
-          </div>
-        </div>
-
-        <div class="help-item">
-          <div class="help-icon">📬</div>
-          <div>
-            <h4>Связь с Дмитрием</h4>
-            <p>Готовы обсудить проект или сотрудничество? Нажмите кнопку <strong>Telegram</strong> вверху или напишите напрямую: <a href="https://t.me/aimovl" target="_blank" style="color: var(--accent-cyan);">@aimovl</a>.</p>
+            <h4>10 тематических 3D-островов</h4>
+            <p>Каждая станция имеет свой 3D-символ: башенный кран у <strong>HgStroy</strong>, боевой танк у <strong>Warpath Wiki</strong>, 3D-кнопка YouTube и бургер у <strong>@burgerdom6 &amp; WarpathHub</strong>, шапочка выпускника у <strong>Study Up</strong>, смартфон у <strong>vertical.team</strong>, AI-ядро у <strong>Dmitry OS</strong>, рожок мороженого у <strong>foodiCE</strong> и бумажный самолётик у <strong>Контактов</strong>.</p>
           </div>
         </div>
       </div>
 
       <div style="text-align: center; margin-top: 10px;">
-        <button class="btn btn--primary" onclick="document.getElementById('help-modal').close()" style="background: var(--accent-cyan); width: 100%;">
-          Понятно, полетели! 🚀
+        <button class="btn btn--primary" onclick="document.getElementById('help-modal').close()" style="background: #dc2626; width: 100%;">
+          Отлично, в полёт! 🚁
         </button>
       </div>
     </div>

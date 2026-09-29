@@ -10,19 +10,17 @@ class App {
   constructor() {
     this.currentPadIndex = 0;
     this.cameraMode = 0; // 0: Follow, 1: High Isometric, 2: Cockpit / Nose
-    this.cameraModesList = ['Следование 🎥', 'Изометрия 📐', 'Кабина 🚁'];
+    this.cameraModesList = ['🎥 Следование', '📐 Изометрия', '🚁 Кабина'];
 
     this.initThree();
     this.initWorld();
     this.initControls();
     this.initUI();
 
-    // Interaction hint sound unlock
     window.addEventListener('click', () => sound.init(), { once: true });
     window.addEventListener('keydown', () => sound.init(), { once: true });
     window.addEventListener('touchstart', () => sound.init(), { once: true });
 
-    // Start render loop
     this.clock = new THREE.Clock();
     this.animate = this.animate.bind(this);
     requestAnimationFrame(this.animate);
@@ -31,12 +29,10 @@ class App {
   initThree() {
     const container = document.getElementById('canvas-container');
 
-    // 1. Scene
     this.scene = new THREE.Scene();
-    this.scene.background = new THREE.Color(0x7dd3fc); // Sky blue
-    this.scene.fog = new THREE.FogExp2(0x7dd3fc, 0.008);
+    this.scene.background = new THREE.Color(0x38bdf8);
+    this.scene.fog = new THREE.FogExp2(0x38bdf8, 0.0065);
 
-    // 2. Camera
     this.camera = new THREE.PerspectiveCamera(
       45,
       window.innerWidth / window.innerHeight,
@@ -45,11 +41,9 @@ class App {
     );
     this.cameraTarget = new THREE.Vector3(0, 2, 0);
 
-    // Initial position looking at HQ
-    this.camera.position.set(0, 18, 28);
-    this.camera.lookAt(0, 1, 0);
+    this.camera.position.set(0, 16, 25);
+    this.camera.lookAt(0, 1.5, 0);
 
-    // 3. Renderer
     this.renderer = new THREE.WebGLRenderer({
       antialias: true,
       powerPreference: 'high-performance'
@@ -63,7 +57,44 @@ class App {
 
     container.appendChild(this.renderer.domElement);
 
-    // Window resize
+    this.raycaster = new THREE.Raycaster();
+    this.mouse = new THREE.Vector2();
+
+    // Click on any 3D island in the viewport to fly there directly
+    this.renderer.domElement.addEventListener('pointerdown', (e) => {
+      if (e.button !== 0) return;
+      this.mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+      this.mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+      this.raycaster.setFromCamera(this.mouse, this.camera);
+
+      const hitObjects = this.world.helipads.map(h => h.group);
+      const intersects = this.raycaster.intersectObjects(hitObjects, true);
+      if (intersects.length > 0) {
+        let obj = intersects[0].object;
+        while (obj && !this.world.helipads.some(h => h.group === obj)) {
+          obj = obj.parent;
+        }
+        const matched = this.world.helipads.find(h => h.group === obj);
+        if (matched) {
+          const padIdx = HELIPADS.findIndex(p => p.id === matched.data.id);
+          if (padIdx !== -1) {
+            sound.playClick();
+            this.flyToPad(padIdx);
+          }
+        }
+      }
+    });
+
+    // Pointer cursor when hovering over a 3D island
+    this.renderer.domElement.addEventListener('pointermove', (e) => {
+      this.mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+      this.mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+      this.raycaster.setFromCamera(this.mouse, this.camera);
+      const hitObjects = this.world.helipads.map(h => h.group);
+      const intersects = this.raycaster.intersectObjects(hitObjects, true);
+      this.renderer.domElement.style.cursor = intersects.length > 0 ? 'pointer' : 'grab';
+    });
+
     window.addEventListener('resize', () => {
       this.camera.aspect = window.innerWidth / window.innerHeight;
       this.camera.updateProjectionMatrix();
@@ -75,7 +106,6 @@ class App {
     this.world = new World(this.scene);
     this.helicopter = new Helicopter(this.scene);
 
-    // Start at HQ pad (0,0)
     const hqPad = HELIPADS[0];
     this.helicopter.teleportTo(hqPad.position);
     this.helicopter.currentPadId = hqPad.id;
@@ -84,7 +114,6 @@ class App {
   initControls() {
     this.controls = new Controls();
 
-    // When manual keys/joystick touched:
     this.controls.onManualInputStarted = () => {
       if (this.helicopter.isAutopilot) {
         this.helicopter.cancelAutopilot();
@@ -96,16 +125,10 @@ class App {
       this.toggleCameraMode();
     };
 
-    this.controls.onMuteToggle = () => {
-      // Audio handled directly in UI/audio
-    };
-
-    // Virtual joystick binding
     const joyContainer = document.getElementById('joystick-container');
     const joyStick = document.getElementById('joystick-stick');
     this.controls.bindVirtualJoystick(joyContainer, joyStick);
 
-    // Lift and descend mobile buttons
     this.controls.bindActionButton(document.getElementById('btn-touch-up'), 'up');
     this.controls.bindActionButton(document.getElementById('btn-touch-down'), 'down');
   }
@@ -129,12 +152,12 @@ class App {
       onToggleCamera: () => {
         this.toggleCameraMode();
       },
-      onToggleMute: (isMuted) => {
-        // UI handles text
+      onToggleMute: () => {},
+      onToggleTheme: (isNight) => {
+        this.world.setNightMode(isNight);
       }
     });
 
-    // Set initial mode & pad
     this.ui.setActivePad(HELIPADS[0].id);
     this.ui.setFlightMode(true);
     this.ui.updateCameraUI(this.cameraModesList[this.cameraMode]);
@@ -152,19 +175,21 @@ class App {
     this.ui.setFlightMode(true);
     this.ui.closeProjectModal();
 
-    sound.playClick();
-
-    // Start smooth helicopter autopilot flight
     this.helicopter.startAutopilotFlight(
       this.helicopter.position,
       targetPad,
       () => {
-        // When landing sequence is complete:
-        this.ui.openProjectModal(targetPad, () => {
-          // Callback when user clicks "Лететь к следующему" in the modal
-          const nextIdx = (this.currentPadIndex + 1) % HELIPADS.length;
-          this.flyToPad(nextIdx);
-        });
+        this.ui.openProjectModal(
+          targetPad,
+          () => {
+            const nextIdx = (this.currentPadIndex + 1) % HELIPADS.length;
+            this.flyToPad(nextIdx);
+          },
+          () => {
+            const prevIdx = (this.currentPadIndex - 1 + HELIPADS.length) % HELIPADS.length;
+            this.flyToPad(prevIdx);
+          }
+        );
       }
     );
   }
@@ -174,47 +199,42 @@ class App {
     const heliYaw = this.helicopter.currentYaw;
 
     if (this.cameraMode === 0) {
-      // 1. Cinematic Follow Camera
-      const distBehind = 18.0;
-      const heightAbove = 10.0;
+      const distBehind = 16.5;
+      const heightAbove = 9.5;
 
-      // Position behind helicopter based on yaw
       const targetCamX = heliPos.x + Math.sin(heliYaw) * distBehind;
       const targetCamZ = heliPos.z + Math.cos(heliYaw) * distBehind;
       const targetCamY = heliPos.y + heightAbove;
 
       const targetCamPos = new THREE.Vector3(targetCamX, targetCamY, targetCamZ);
-      this.camera.position.lerp(targetCamPos, delta * 3.5);
+      this.camera.position.lerp(targetCamPos, Math.min(1, delta * 5.0));
 
-      // Look slightly ahead of helicopter
       const lookTarget = heliPos.clone().add(new THREE.Vector3(
-        -Math.sin(heliYaw) * 4.0,
-        1.5,
-        -Math.cos(heliYaw) * 4.0
+        -Math.sin(heliYaw) * 3.5,
+        1.2,
+        -Math.cos(heliYaw) * 3.5
       ));
-      this.cameraTarget.lerp(lookTarget, delta * 4.5);
+      this.cameraTarget.lerp(lookTarget, Math.min(1, delta * 6.5));
       this.camera.lookAt(this.cameraTarget);
 
     } else if (this.cameraMode === 1) {
-      // 2. High Isometric Overview
-      const targetCamPos = new THREE.Vector3(heliPos.x, heliPos.y + 35, heliPos.z + 28);
-      this.camera.position.lerp(targetCamPos, delta * 4.0);
-      this.cameraTarget.lerp(heliPos, delta * 5.0);
+      const targetCamPos = new THREE.Vector3(heliPos.x, heliPos.y + 34, heliPos.z + 28);
+      this.camera.position.lerp(targetCamPos, Math.min(1, delta * 5.0));
+      this.cameraTarget.lerp(heliPos, Math.min(1, delta * 6.0));
       this.camera.lookAt(this.cameraTarget);
 
     } else if (this.cameraMode === 2) {
-      // 3. Cockpit / Nose View
       const nosePos = heliPos.clone().add(new THREE.Vector3(
-        -Math.sin(heliYaw) * 1.2,
-        0.9,
-        -Math.cos(heliYaw) * 1.2
+        -Math.sin(heliYaw) * 1.4,
+        1.1,
+        -Math.cos(heliYaw) * 1.4
       ));
       this.camera.position.copy(nosePos);
 
       const lookAhead = nosePos.clone().add(new THREE.Vector3(
-        -Math.sin(heliYaw) * 20.0,
+        -Math.sin(heliYaw) * 22.0,
         -1.5,
-        -Math.cos(heliYaw) * 20.0
+        -Math.cos(heliYaw) * 22.0
       ));
       this.camera.lookAt(lookAhead);
     }
@@ -226,7 +246,7 @@ class App {
       return;
     }
 
-    const pad = this.world.getHelipadAt(this.helicopter.position, 6.0);
+    const pad = this.world.getHelipadAt(this.helicopter.position, 6.2);
     if (pad) {
       this.ui.showProximityPrompt(pad, () => {
         const padIdx = HELIPADS.findIndex(p => p.id === pad.id);
@@ -244,29 +264,20 @@ class App {
 
     const delta = Math.min(this.clock.getDelta(), 0.1);
 
-    // Update helicopter physics
     this.helicopter.update(delta, this.controls.input);
-
-    // Update 3D world elements (turbines, clouds, stars)
     this.world.update(delta);
 
-    // Check collectible stars
     this.world.checkStarCollisions(this.helicopter.position, (collected, total) => {
       this.ui.updateStarsCount(collected, total);
     });
 
-    // Check proximity to helipads for landing prompt
     this.checkProximityToPads();
-
-    // Smooth camera motion
     this.updateCamera(delta);
 
-    // Render 3D Scene
     this.renderer.render(this.scene, this.camera);
   }
 }
 
-// Bootstrap application on DOM ready
 window.addEventListener('DOMContentLoaded', () => {
   new App();
 });
