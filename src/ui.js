@@ -57,6 +57,15 @@ export class UI {
     this.guideAiBtn = document.getElementById('btn-guide-ai');
     this.guideContactBtn = document.getElementById('btn-guide-contact');
     this.guide67Btn = document.getElementById('btn-guide-67');
+    this.touch67Btn = document.getElementById('btn-touch-67');
+    this.rotateOverlay = document.getElementById('rotate-device-overlay');
+    this.dismissRotateBtn = document.getElementById('btn-dismiss-rotate');
+
+    // On mobile landscape screens, keep guide widget collapsed by default so 3D view is wide open
+    if ((window.innerWidth <= 960 || window.innerHeight <= 540) && this.guideWidget && this.toggleGuideBtn) {
+      this.guideWidget.classList.add('guide-widget--collapsed');
+      this.toggleGuideBtn.textContent = '＋';
+    }
 
     this.updateMuteButtonUI();
   }
@@ -212,6 +221,20 @@ export class UI {
       this.guide67Btn.addEventListener('click', () => {
         sound.playClick();
         if (this.onFlyToSkyHangar) this.onFlyToSkyHangar();
+      });
+    }
+
+    if (this.touch67Btn) {
+      this.touch67Btn.addEventListener('click', () => {
+        sound.playClick();
+        if (this.onFlyToSkyHangar) this.onFlyToSkyHangar();
+      });
+    }
+
+    if (this.dismissRotateBtn && this.rotateOverlay) {
+      this.dismissRotateBtn.addEventListener('click', () => {
+        sound.playClick();
+        this.rotateOverlay.classList.add('rotate-device-overlay--dismissed');
       });
     }
   }

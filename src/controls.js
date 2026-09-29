@@ -150,10 +150,11 @@ export class Controls {
       const normX = stickX / maxRadius;
       const normY = stickY / maxRadius;
 
-      this.input.forward = normY < -0.25;
-      this.input.back = normY > 0.25;
-      this.input.left = normX < -0.25;
-      this.input.right = normX > 0.25;
+      this.input.forward = normY < -0.22;
+      this.input.back = normY > 0.22;
+      this.input.left = normX < -0.22;
+      this.input.right = normX > 0.22;
+      this.input.turbo = clampedDist > maxRadius * 0.78;
     };
 
     const handleEnd = () => {
@@ -163,9 +164,11 @@ export class Controls {
       this.input.back = false;
       this.input.left = false;
       this.input.right = false;
+      this.input.turbo = false;
     };
 
     container.addEventListener('pointerdown', (e) => {
+      e.preventDefault();
       container.setPointerCapture(e.pointerId);
       handleStart(e.clientX, e.clientY);
       handleMove(e.clientX, e.clientY);
@@ -173,6 +176,7 @@ export class Controls {
 
     container.addEventListener('pointermove', (e) => {
       if (this.joystickActive) {
+        e.preventDefault();
         handleMove(e.clientX, e.clientY);
       }
     });

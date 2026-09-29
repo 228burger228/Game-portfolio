@@ -21,6 +21,20 @@
 </head>
 <body>
 
+  <!-- MOBILE PORTRAIT ORIENTATION WARNING OVERLAY -->
+  <div class="rotate-device-overlay" id="rotate-device-overlay">
+    <div class="rotate-device-card">
+      <div class="rotate-phone-anim" aria-hidden="true">📱</div>
+      <h2 class="rotate-device-title">Поверните телефон горизонтально</h2>
+      <p class="rotate-device-desc">
+        Для удобного пилотирования вертолёта и обзора 3D-островов портфолио переведите смартфон в <strong>горизонтальный (альбомный) режим</strong>.
+      </p>
+      <button type="button" class="rotate-dismiss-btn" id="btn-dismiss-rotate">
+        Продолжить без поворота →
+      </button>
+    </div>
+  </div>
+
   <!-- 3D Three.js WebGL Viewport -->
   <div id="canvas-container"></div>
 
@@ -124,12 +138,13 @@
       <span class="radar-label">RADAR · SPACE ☁️</span>
     </div>
 
-    <!-- TOUCH CONTROLS (Mobile) -->
+    <!-- TOUCH CONTROLS (Mobile Landscape) -->
     <div class="touch-controls" id="touch-controls">
       <div class="joystick-container" id="joystick-container">
         <div class="joystick-stick" id="joystick-stick"></div>
       </div>
       <div class="touch-buttons">
+        <button class="touch-btn touch-btn--secret" id="btn-touch-67" aria-label="Взлететь к пасхалке 67">☁️</button>
         <button class="touch-btn" id="btn-touch-up" aria-label="Взлёт / Подъём">▲</button>
         <button class="touch-btn" id="btn-touch-down" aria-label="Снижение / Посадка">▼</button>
       </div>
