@@ -8,103 +8,319 @@ export class World {
     this.helipads = [];
     this.turbines = [];
     this.animatedLandmarks = [];
+    this.shoreFoamRings = [];
     this.stars = [];
     this.clouds = [];
     this.collectedStarsCount = 0;
     this.totalStars = COLLECTIBLE_STARS.length;
 
+    // Secret Sky Hangar ("67") coordinates above the clouds
+    this.skyHangarPos = new THREE.Vector3(0, 34.5, -14);
+    this.isInsideSkyHangar = false;
+
     this.buildLighting();
+    this.buildSkyDome();
     this.buildTerrain();
     this.buildHelipadsAndLandmarks();
     this.buildVegetation();
+    this.buildSwayingGrass();
     this.buildWindmills();
     this.buildCollectibleStars();
     this.buildClouds();
+    this.buildSecretSkyHangar();
   }
 
   buildLighting() {
-    this.ambientLight = new THREE.AmbientLight(0xe0f2fe, 1.35);
+    this.ambientLight = new THREE.AmbientLight(0xe0f2fe, 1.25);
     this.scene.add(this.ambientLight);
 
-    this.sunLight = new THREE.DirectionalLight(0xfff7ed, 2.3);
-    this.sunLight.position.set(55, 75, 45);
+    this.sunLight = new THREE.DirectionalLight(0xfff1e6, 2.6);
+    this.sunLight.position.set(65, 78, -55);
     this.sunLight.castShadow = true;
 
     this.sunLight.shadow.mapSize.width = 2048;
     this.sunLight.shadow.mapSize.height = 2048;
     this.sunLight.shadow.camera.near = 10;
-    this.sunLight.shadow.camera.far = 220;
-    this.sunLight.shadow.camera.left = -95;
-    this.sunLight.shadow.camera.right = 95;
-    this.sunLight.shadow.camera.top = 95;
-    this.sunLight.shadow.camera.bottom = -95;
+    this.sunLight.shadow.camera.far = 240;
+    this.sunLight.shadow.camera.left = -105;
+    this.sunLight.shadow.camera.right = 105;
+    this.sunLight.shadow.camera.top = 105;
+    this.sunLight.shadow.camera.bottom = -105;
     this.sunLight.shadow.bias = -0.0005;
 
     this.scene.add(this.sunLight);
 
-    this.hemiLight = new THREE.HemisphereLight(0xbae6fd, 0x1e293b, 0.75);
+    this.hemiLight = new THREE.HemisphereLight(0xbae6fd, 0x1e293b, 0.85);
     this.scene.add(this.hemiLight);
   }
 
-  setNightMode(isNight) {
-    if (isNight) {
-      this.scene.background.setHex(0x090d16);
-      this.scene.fog.color.setHex(0x090d16);
-      this.ambientLight.color.setHex(0x38bdf8);
-      this.ambientLight.intensity = 0.48;
-      this.sunLight.color.setHex(0x818cf8);
-      this.sunLight.intensity = 1.05;
-      this.hemiLight.intensity = 0.35;
-      if (this.waterMat) this.waterMat.color.setHex(0x082f49);
-    } else {
-      this.scene.background.setHex(0x38bdf8);
-      this.scene.fog.color.setHex(0x38bdf8);
+  buildSkyDome() {
+    const skyGeo = new THREE.SphereGeometry(420, 32, 24);
+    this.skyUniforms = {
+      uTopColor: { value: new THREE.Color(0x0284c7) },
+      uHorizonColor: { value: new THREE.Color(0x7dd3fc) },
+      uBottomColor: { value: new THREE.Color(0x0c4a6e) },
+      uSunDir: { value: new THREE.Vector3(0.55, 0.45, -0.65).normalize() },
+      uSunColor: { value: new THREE.Color(0xfff7ed) },
+      uStarIntensity: { value: 0.0 },
+      uTime: { value: 0 }
+    };
+
+    const skyMat = new THREE.ShaderMaterial({
+      uniforms: this.skyUniforms,
+      side: THREE.BackSide,
+      depthWrite: false,
+      vertexShader: `
+        varying vec3 vWorldPos;
+        void main() {
+          vec4 wp = modelMatrix * vec4(position, 1.0);
+          vWorldPos = wp.xyz;
+          gl_Position = projectionMatrix * viewMatrix * wp;
+        }
+      `,
+      fragmentShader: `
+        varying vec3 vWorldPos;
+        uniform vec3 uTopColor;
+        uniform vec3 uHorizonColor;
+        uniform vec3 uBottomColor;
+        uniform vec3 uSunDir;
+        uniform vec3 uSunColor;
+        uniform float uStarIntensity;
+        uniform float uTime;
+
+        float hash(vec3 p) {
+          p = fract(p * 0.3183099 + 0.1);
+          p *= 17.0;
+          return fract(p.x * p.y * p.z * (p.x + p.y + p.z));
+        }
+
+        void main() {
+          vec3 dir = normalize(vWorldPos);
+          float h = clamp(dir.y, 0.0, 1.0);
+          vec3 col = mix(uHorizonColor, uTopColor, pow(h, 0.55));
+          if (dir.y < 0.0) {
+            col = mix(uHorizonColor, uBottomColor, clamp(-dir.y * 3.0, 0.0, 1.0));
+          }
+
+          // Sun disk & atmospheric Mie glow
+          float sunAmt = max(dot(dir, uSunDir), 0.0);
+          col += uSunColor * pow(sunAmt, 12.0) * 0.45;
+          col += uSunColor * smoothstep(0.996, 0.9995, sunAmt) * 2.2;
+
+          // Subtle stars at Sunset / Night
+          if (uStarIntensity > 0.01 && dir.y > 0.05) {
+            float s = hash(floor(dir * 260.0));
+            if (s > 0.994) {
+              float twinkle = 0.55 + 0.45 * sin(uTime * 3.0 + s * 100.0);
+              col += vec3(0.9, 0.95, 1.0) * twinkle * uStarIntensity * smoothstep(0.05, 0.35, dir.y);
+            }
+          }
+
+          gl_FragColor = vec4(col, 1.0);
+        }
+      `
+    });
+
+    this.skyDome = new THREE.Mesh(skyGeo, skyMat);
+    this.scene.add(this.skyDome);
+  }
+
+  // Supports boolean or 4-mode index (0: Day, 1: Genshin Sunset, 2: Rust Fog Dawn, 3: Cyber Night)
+  setNightMode(modeOrBool) {
+    const mode = typeof modeOrBool === 'boolean' ? (modeOrBool ? 3 : 0) : (modeOrBool % 4);
+    if (mode === 0) {
+      // 0: Genshin Azure Day
+      this.scene.fog.color.setHex(0x67e8f9);
+      this.scene.fog.density = 0.0042;
       this.ambientLight.color.setHex(0xe0f2fe);
-      this.ambientLight.intensity = 1.35;
+      this.ambientLight.intensity = 1.25;
       this.sunLight.color.setHex(0xfff7ed);
-      this.sunLight.intensity = 2.3;
+      this.sunLight.intensity = 2.6;
+      this.hemiLight.intensity = 0.85;
+      this.skyUniforms.uTopColor.value.setHex(0x0284c7);
+      this.skyUniforms.uHorizonColor.value.setHex(0x7dd3fc);
+      this.skyUniforms.uSunColor.value.setHex(0xfff7ed);
+      this.skyUniforms.uSunDir.value.set(0.55, 0.45, -0.65).normalize();
+      this.skyUniforms.uStarIntensity.value = 0.0;
+      if (this.waterUniforms) {
+        this.waterUniforms.uDeepColor.value.setHex(0x083344);
+        this.waterUniforms.uShallowColor.value.setHex(0x06b6d4);
+        this.waterUniforms.uSunColor.value.setHex(0xfef08a);
+      }
+    } else if (mode === 1) {
+      // 1: Genshin Golden Sunset
+      this.scene.fog.color.setHex(0xfb923c);
+      this.scene.fog.density = 0.0052;
+      this.ambientLight.color.setHex(0xfed7aa);
+      this.ambientLight.intensity = 1.05;
+      this.sunLight.color.setHex(0xf97316);
+      this.sunLight.intensity = 2.9;
       this.hemiLight.intensity = 0.75;
-      if (this.waterMat) this.waterMat.color.setHex(0x0369a1);
+      this.skyUniforms.uTopColor.value.setHex(0x3b0764);
+      this.skyUniforms.uHorizonColor.value.setHex(0xfb923c);
+      this.skyUniforms.uSunColor.value.setHex(0xfde047);
+      this.skyUniforms.uSunDir.value.set(0.65, 0.16, -0.72).normalize();
+      this.skyUniforms.uStarIntensity.value = 0.35;
+      if (this.waterUniforms) {
+        this.waterUniforms.uDeepColor.value.setHex(0x1e1b4b);
+        this.waterUniforms.uShallowColor.value.setHex(0x0e7490);
+        this.waterUniforms.uSunColor.value.setHex(0xfb923c);
+      }
+    } else if (mode === 2) {
+      // 2: Rust Tactical Misty Dawn
+      this.scene.fog.color.setHex(0x94a3b8);
+      this.scene.fog.density = 0.0075;
+      this.ambientLight.color.setHex(0xcbd5e1);
+      this.ambientLight.intensity = 0.95;
+      this.sunLight.color.setHex(0xfde68a);
+      this.sunLight.intensity = 1.95;
+      this.hemiLight.intensity = 0.65;
+      this.skyUniforms.uTopColor.value.setHex(0x334155);
+      this.skyUniforms.uHorizonColor.value.setHex(0x94a3b8);
+      this.skyUniforms.uSunColor.value.setHex(0xfde68a);
+      this.skyUniforms.uSunDir.value.set(-0.55, 0.22, -0.65).normalize();
+      this.skyUniforms.uStarIntensity.value = 0.0;
+      if (this.waterUniforms) {
+        this.waterUniforms.uDeepColor.value.setHex(0x0f172a);
+        this.waterUniforms.uShallowColor.value.setHex(0x155e75);
+        this.waterUniforms.uSunColor.value.setHex(0xfde68a);
+      }
+    } else {
+      // 3: Cyber Neon Night
+      this.scene.fog.color.setHex(0x060b16);
+      this.scene.fog.density = 0.0048;
+      this.ambientLight.color.setHex(0x38bdf8);
+      this.ambientLight.intensity = 0.52;
+      this.sunLight.color.setHex(0x818cf8);
+      this.sunLight.intensity = 1.15;
+      this.hemiLight.intensity = 0.4;
+      this.skyUniforms.uTopColor.value.setHex(0x020617);
+      this.skyUniforms.uHorizonColor.value.setHex(0x0f172a);
+      this.skyUniforms.uSunColor.value.setHex(0x38bdf8);
+      this.skyUniforms.uSunDir.value.set(0.3, 0.35, -0.85).normalize();
+      this.skyUniforms.uStarIntensity.value = 1.0;
+      if (this.waterUniforms) {
+        this.waterUniforms.uDeepColor.value.setHex(0x020617);
+        this.waterUniforms.uShallowColor.value.setHex(0x0369a1);
+        this.waterUniforms.uSunColor.value.setHex(0x38bdf8);
+      }
     }
   }
 
   buildTerrain() {
-    // 1. Stylized Water Ocean
-    const waterGeo = new THREE.PlaneGeometry(380, 380, 24, 24);
+    // 1. Custom GLSL Ocean Water Shader (Gerstner Waves + Fresnel + Specular Sun Trail + Foam)
+    const waterGeo = new THREE.PlaneGeometry(520, 520, 128, 128);
     waterGeo.rotateX(-Math.PI / 2);
-    this.waterMat = new THREE.MeshStandardMaterial({
-      color: 0x0369a1,
-      roughness: 0.15,
-      metalness: 0.55,
+
+    this.waterUniforms = {
+      uTime: { value: 0 },
+      uDeepColor: { value: new THREE.Color(0x083344) },
+      uShallowColor: { value: new THREE.Color(0x06b6d4) },
+      uSunDir: { value: new THREE.Vector3(0.55, 0.45, -0.65).normalize() },
+      uSunColor: { value: new THREE.Color(0xfef08a) }
+    };
+
+    const waterMat = new THREE.ShaderMaterial({
+      uniforms: this.waterUniforms,
       transparent: true,
-      opacity: 0.88
+      vertexShader: `
+        uniform float uTime;
+        varying vec3 vWorldPos;
+        varying vec3 vNormal;
+        varying float vWaveHeight;
+
+        void main() {
+          vec3 pos = position;
+          float w1 = sin(pos.x * 0.08 + uTime * 1.6) * cos(pos.z * 0.07 + uTime * 1.3) * 0.38;
+          float w2 = sin((pos.x * 0.14 - pos.z * 0.11) + uTime * 2.3) * 0.18;
+          float w3 = cos(pos.z * 0.22 + uTime * 2.9) * 0.08;
+          pos.y += w1 + w2 + w3;
+          vWaveHeight = w1 + w2 + w3;
+
+          // Approximate wave normal
+          float dx = cos(pos.x * 0.08 + uTime * 1.6) * 0.08 * 0.38 + cos((pos.x * 0.14 - pos.z * 0.11) + uTime * 2.3) * 0.14 * 0.18;
+          float dz = -sin(pos.z * 0.07 + uTime * 1.3) * 0.07 * 0.38 - cos((pos.x * 0.14 - pos.z * 0.11) + uTime * 2.3) * 0.11 * 0.18;
+          vNormal = normalize(vec3(-dx, 1.0, -dz));
+
+          vec4 wp = modelMatrix * vec4(pos, 1.0);
+          vWorldPos = wp.xyz;
+          gl_Position = projectionMatrix * viewMatrix * wp;
+        }
+      `,
+      fragmentShader: `
+        uniform float uTime;
+        uniform vec3 uDeepColor;
+        uniform vec3 uShallowColor;
+        uniform vec3 uSunDir;
+        uniform vec3 uSunColor;
+        varying vec3 vWorldPos;
+        varying vec3 vNormal;
+        varying float vWaveHeight;
+
+        void main() {
+          vec3 viewDir = normalize(cameraPosition - vWorldPos);
+          vec3 norm = normalize(vNormal);
+
+          // Fresnel reflection factor
+          float fresnel = pow(1.0 - max(dot(viewDir, norm), 0.0), 3.0);
+          vec3 waterCol = mix(uShallowColor, uDeepColor, clamp(fresnel * 0.85 + 0.15, 0.0, 1.0));
+
+          // Wave crest turquoise highlight & subtle whitecap foam
+          float crest = smoothstep(0.22, 0.58, vWaveHeight);
+          waterCol = mix(waterCol, vec3(0.75, 0.96, 1.0), crest * 0.32);
+
+          // Subtle grid/caustic shimmer
+          float caustic = sin(vWorldPos.x * 0.45 + uTime * 2.0) * sin(vWorldPos.z * 0.45 - uTime * 1.7);
+          waterCol += vec3(0.04, 0.12, 0.16) * smoothstep(0.65, 0.98, caustic);
+
+          // Specular Sun Glitter Trail
+          vec3 halfVec = normalize(uSunDir + viewDir);
+          float spec = pow(max(dot(norm, halfVec), 0.0), 96.0);
+          waterCol += uSunColor * spec * 1.35;
+
+          // Distance atmospheric fade
+          float dist = length(vWorldPos.xz);
+          float edgeFade = smoothstep(250.0, 140.0, dist);
+
+          gl_FragColor = vec4(waterCol, 0.92 * edgeFade);
+        }
+      `
     });
-    const water = new THREE.Mesh(waterGeo, this.waterMat);
-    water.position.y = -1.2;
-    water.receiveShadow = true;
+
+    const water = new THREE.Mesh(waterGeo, waterMat);
+    water.position.y = -1.05;
     this.scene.add(water);
 
-    // 2. Islands for each station
+    // 2. Sculpted Multi-Layered Islands (Genshin Stylized Emerald Grass + Craggy Rock Cliffs + Shoreline Foam)
     const grassMat = new THREE.MeshStandardMaterial({
       color: 0x10b981,
-      roughness: 0.8,
+      roughness: 0.68,
       metalness: 0.05,
       flatShading: true
     });
 
     const sandMat = new THREE.MeshStandardMaterial({
-      color: 0xfde047,
-      roughness: 0.85,
+      color: 0xfde68a,
+      roughness: 0.82,
       flatShading: true
     });
 
     const rockMat = new THREE.MeshStandardMaterial({
       color: 0x334155,
-      roughness: 0.9,
+      roughness: 0.85,
+      metalness: 0.12,
       flatShading: true
     });
 
-    HELIPADS.forEach((pad) => {
+    const foamRingMat = new THREE.MeshBasicMaterial({
+      color: 0xe0f2fe,
+      transparent: true,
+      opacity: 0.55,
+      side: THREE.DoubleSide,
+      depthWrite: false
+    });
+
+    HELIPADS.forEach((pad, idx) => {
       const isHQ = pad.id === 'hq';
       const radius = isHQ ? 22 : 16.5;
 
@@ -112,7 +328,7 @@ export class World {
       islandGroup.position.set(pad.position.x, 0, pad.position.z);
 
       // Top emerald grass plateau
-      const topGeo = new THREE.CylinderGeometry(radius, radius * 1.08, 1.0, 12);
+      const topGeo = new THREE.CylinderGeometry(radius, radius * 1.07, 1.05, 18);
       const topMesh = new THREE.Mesh(topGeo, grassMat);
       topMesh.position.y = 0.05;
       topMesh.receiveShadow = true;
@@ -120,17 +336,59 @@ export class World {
       islandGroup.add(topMesh);
 
       // Sand beach rim
-      const sandGeo = new THREE.CylinderGeometry(radius * 1.09, radius * 1.18, 0.7, 12);
+      const sandGeo = new THREE.CylinderGeometry(radius * 1.08, radius * 1.19, 0.78, 18);
       const sandMesh = new THREE.Mesh(sandGeo, sandMat);
-      sandMesh.position.y = -0.35;
+      sandMesh.position.y = -0.38;
       sandMesh.receiveShadow = true;
       islandGroup.add(sandMesh);
 
-      // Rocky underside
-      const rockGeo = new THREE.CylinderGeometry(radius * 1.16, radius * 0.45, 4.2, 10);
+      // Sculpted craggy rock cliffs underneath (vertex-displaced for organic cliff facets)
+      const rockGeo = new THREE.CylinderGeometry(radius * 1.16, radius * 0.52, 4.8, 16, 3);
+      const posAttr = rockGeo.attributes.position;
+      for (let v = 0; v < posAttr.count; v++) {
+        const vx = posAttr.getX(v);
+        const vy = posAttr.getY(v);
+        const vz = posAttr.getZ(v);
+        if (vy < 2.0) {
+          const n = Math.sin(vx * 0.45 + idx) * Math.cos(vz * 0.45 + vy) * 1.15;
+          posAttr.setX(v, vx + (vx / radius) * n);
+          posAttr.setZ(v, vz + (vz / radius) * n);
+        }
+      }
+      rockGeo.computeVertexNormals();
       const rockMesh = new THREE.Mesh(rockGeo, rockMat);
-      rockMesh.position.y = -2.6;
+      rockMesh.position.y = -2.75;
+      rockMesh.castShadow = true;
+      rockMesh.receiveShadow = true;
       islandGroup.add(rockMesh);
+
+      // Coastal rock boulders around perimeter
+      for (let b = 0; b < 5; b++) {
+        const ang = (b / 5) * Math.PI * 2 + idx * 0.7;
+        const bDist = radius * (0.95 + (b % 2) * 0.14);
+        const boulder = new THREE.Mesh(
+          new THREE.DodecahedronGeometry(1.1 + (b % 3) * 0.55, 0),
+          rockMat
+        );
+        boulder.position.set(
+          Math.cos(ang) * bDist,
+          b % 2 === 0 ? -0.35 : 0.45,
+          Math.sin(ang) * bDist
+        );
+        boulder.scale.set(1.3, 0.85, 1.1);
+        boulder.rotation.set(b, b * 1.2, 0);
+        boulder.castShadow = true;
+        boulder.receiveShadow = true;
+        islandGroup.add(boulder);
+      }
+
+      // Animated Shoreline Foam Ring in the water around each island
+      const foamGeo = new THREE.RingGeometry(radius * 1.14, radius * 1.27, 32);
+      foamGeo.rotateX(-Math.PI / 2);
+      const foamMesh = new THREE.Mesh(foamGeo, foamRingMat.clone());
+      foamMesh.position.y = -0.96;
+      islandGroup.add(foamMesh);
+      this.shoreFoamRings.push({ mesh: foamMesh, phase: idx * 0.8 });
 
       this.scene.add(islandGroup);
     });
@@ -140,8 +398,9 @@ export class World {
 
   buildBridges() {
     const bridgeMat = new THREE.MeshStandardMaterial({
-      color: 0x334155,
-      roughness: 0.6,
+      color: 0x1e293b,
+      roughness: 0.45,
+      metalness: 0.45,
       flatShading: true
     });
 
@@ -168,8 +427,8 @@ export class World {
       bridge.receiveShadow = true;
       this.scene.add(bridge);
 
-      const lineGeo = new THREE.BoxGeometry(0.24, 0.38, dist * 0.9);
-      const lineMat = new THREE.MeshBasicMaterial({ color: 0xfacc15 });
+      const lineGeo = new THREE.BoxGeometry(0.26, 0.39, dist * 0.9);
+      const lineMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8 });
       const line = new THREE.Mesh(lineGeo, lineMat);
       line.position.copy(mid);
       line.lookAt(vTo);
@@ -780,6 +1039,43 @@ export class World {
     });
   }
 
+  buildSwayingGrass() {
+    // Genshin-style wind-swaying grass blades across all islands using InstancedMesh
+    const bladeGeo = new THREE.ConeGeometry(0.14, 0.75, 4);
+    bladeGeo.translate(0, 0.35, 0);
+    const bladeMat = new THREE.MeshStandardMaterial({
+      color: 0x22c55e,
+      roughness: 0.6,
+      flatShading: true
+    });
+
+    const totalBlades = HELIPADS.length * 28;
+    this.grassInstanced = new THREE.InstancedMesh(bladeGeo, bladeMat, totalBlades);
+    this.grassTransforms = [];
+
+    const dummy = new THREE.Object3D();
+    let index = 0;
+    HELIPADS.forEach((pad, pIdx) => {
+      const maxR = pad.id === 'hq' ? 19.5 : 14.2;
+      for (let i = 0; i < 28; i++) {
+        const angle = (i / 28) * Math.PI * 2 + pIdx * 0.4;
+        const r = 7.2 + ((i * 7 + pIdx * 3) % 10) / 10 * (maxR - 7.2);
+        const gx = pad.position.x + Math.cos(angle) * r;
+        const gz = pad.position.z + Math.sin(angle) * r;
+        const scale = 0.75 + (i % 4) * 0.22;
+
+        dummy.position.set(gx, 0.52, gz);
+        dummy.rotation.set(0, angle, 0);
+        dummy.scale.set(scale, scale, scale);
+        dummy.updateMatrix();
+        this.grassInstanced.setMatrixAt(index, dummy.matrix);
+        this.grassTransforms.push({ x: gx, z: gz, angle, scale, phase: i * 0.5 + pIdx });
+        index++;
+      }
+    });
+    this.scene.add(this.grassInstanced);
+  }
+
   buildWindmills() {
     const turbinePositions = [
       { x: -62, z: -5 },
@@ -828,8 +1124,8 @@ export class World {
       color: 0xfbbf24,
       roughness: 0.15,
       metalness: 0.9,
-      emissive: 0xd97706,
-      emissiveIntensity: 0.4
+      emissive: 0xf59e0b,
+      emissiveIntensity: 0.65
     });
 
     COLLECTIBLE_STARS.forEach((starData) => {
@@ -847,42 +1143,338 @@ export class World {
     });
   }
 
+  resetStars() {
+    this.collectedStarsCount = 0;
+    this.stars.forEach((s) => {
+      s.collected = false;
+      s.mesh.visible = true;
+      s.mesh.scale.set(1, 1, 1);
+      s.mesh.material.opacity = 1;
+    });
+  }
+
   buildClouds() {
+    const cloudMat = new THREE.MeshStandardMaterial({
+      color: 0xffffff,
+      roughness: 0.85,
+      flatShading: true,
+      transparent: true,
+      opacity: 0.86
+    });
+
+    for (let c = 0; c < 16; c++) {
+      const cloudGroup = new THREE.Group();
+      cloudGroup.position.set(
+        (Math.random() - 0.5) * 220,
+        19 + Math.random() * 6,
+        (Math.random() - 0.5) * 220
+      );
+
+      for (let s = 0; s < 4; s++) {
+        const puff = new THREE.Mesh(new THREE.DodecahedronGeometry(2.4 + Math.random() * 1.8, 1), cloudMat);
+        puff.position.set((s - 1.5) * 2.3, (Math.random() - 0.5) * 0.8, (Math.random() - 0.5) * 1.2);
+        cloudGroup.add(puff);
+      }
+
+      this.scene.add(cloudGroup);
+      this.clouds.push({ group: cloudGroup, speed: 1.1 + Math.random() * 1.1 });
+    }
+  }
+
+  createGraffitiWallTexture() {
+    const canvas = document.createElement('canvas');
+    canvas.width = 1024;
+    canvas.height = 512;
+    const ctx = canvas.getContext('2d');
+
+    // Concrete / industrial hangar wall background
+    const bgGrad = ctx.createLinearGradient(0, 0, 1024, 512);
+    bgGrad.addColorStop(0, '#18181b');
+    bgGrad.addColorStop(0.5, '#27272a');
+    bgGrad.addColorStop(1, '#09090b');
+    ctx.fillStyle = bgGrad;
+    ctx.fillRect(0, 0, 1024, 512);
+
+    // Subtle brick/corrugated lines
+    ctx.strokeStyle = 'rgba(255,255,255,0.05)';
+    ctx.lineWidth = 3;
+    for (let y = 0; y < 512; y += 32) {
+      ctx.beginPath();
+      ctx.moveTo(0, y);
+      ctx.lineTo(1024, y);
+      ctx.stroke();
+    }
+
+    // Neon spray paint splatter blobs behind graffiti
+    const splatters = [
+      { x: 220, y: 180, r: 150, col: 'rgba(236, 72, 153, 0.35)' },
+      { x: 520, y: 210, r: 190, col: 'rgba(56, 189, 248, 0.32)' },
+      { x: 820, y: 190, r: 155, col: 'rgba(250, 204, 21, 0.3)' }
+    ];
+    splatters.forEach((sp) => {
+      const g = ctx.createRadialGradient(sp.x, sp.y, 10, sp.x, sp.y, sp.r);
+      g.addColorStop(0, sp.col);
+      g.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, 1024, 512);
+    });
+
+    // Spray paint drips
+    ctx.fillStyle = '#ec4899';
+    [180, 235, 490, 560, 790].forEach((dx, i) => {
+      ctx.fillRect(dx, 210, 8, 45 + (i % 3) * 28);
+    });
+
+    // Huge Street-Art "67" Tag at top-left & top-right
+    ctx.save();
+    ctx.translate(155, 165);
+    ctx.rotate(-0.08);
+    ctx.font = '900 135px Impact, "Arial Black", sans-serif';
+    ctx.textAlign = 'center';
+    ctx.lineWidth = 14;
+    ctx.strokeStyle = '#09090b';
+    ctx.strokeText('67', 0, 0);
+    ctx.fillStyle = '#facc15';
+    ctx.fillText('67', 0, 0);
+    ctx.restore();
+
+    ctx.save();
+    ctx.translate(875, 165);
+    ctx.rotate(0.08);
+    ctx.font = '900 135px Impact, "Arial Black", sans-serif';
+    ctx.textAlign = 'center';
+    ctx.lineWidth = 14;
+    ctx.strokeStyle = '#09090b';
+    ctx.strokeText('67', 0, 0);
+    ctx.fillStyle = '#38bdf8';
+    ctx.fillText('67', 0, 0);
+    ctx.restore();
+
+    // Crown above center
+    ctx.fillStyle = '#facc15';
+    ctx.font = 'bold 58px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('👑 SECRET HANGAR 67 👑', 512, 82);
+
+    // Main Street-Art Graffiti Text: "ТЫ ЧЁ ЗАБЫЛ ЗДЕСЬ? ДАЙ ОТДОХНУТЬ НОРМАЛЬНО!"
+    ctx.save();
+    ctx.translate(512, 265);
+    ctx.rotate(-0.025);
+    ctx.font = '900 68px "Arial Black", Impact, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.shadowColor = '#ec4899';
+    ctx.shadowBlur = 24;
+    ctx.lineWidth = 14;
+    ctx.strokeStyle = '#000000';
+    ctx.strokeText('ТЫ ЧЁ ЗАБЫЛ ЗДЕСЬ?!', 0, 0);
+    ctx.fillStyle = '#ff2a85';
+    ctx.fillText('ТЫ ЧЁ ЗАБЫЛ ЗДЕСЬ?!', 0, 0);
+    ctx.restore();
+
+    ctx.save();
+    ctx.translate(512, 375);
+    ctx.rotate(0.02);
+    ctx.font = '900 62px "Arial Black", Impact, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.shadowColor = '#38bdf8';
+    ctx.shadowBlur = 22;
+    ctx.lineWidth = 13;
+    ctx.strokeStyle = '#000000';
+    ctx.strokeText('ДАЙ ОТДОХНУТЬ НОРМАЛЬНО!', 0, 0);
+    ctx.fillStyle = '#38bdf8';
+    ctx.fillText('ДАЙ ОТДОХНУТЬ НОРМАЛЬНО!', 0, 0);
+    ctx.restore();
+
+    // Bottom graffiti signature tag
+    ctx.font = 'italic 800 30px Inter, sans-serif';
+    ctx.fillStyle = '#a3e635';
+    ctx.textAlign = 'center';
+    ctx.fillText('🎵 NOW PLAYING: 67 MEME BEAT · BURGERDOM6 VIP CHILL ZONE 🍔', 512, 468);
+
+    const tex = new THREE.CanvasTexture(canvas);
+    tex.needsUpdate = true;
+    return tex;
+  }
+
+  buildSecretSkyHangar() {
+    // Floating Island above the clouds at (0, 34, -14)
+    this.skyIslandGroup = new THREE.Group();
+    this.skyIslandGroup.position.copy(this.skyHangarPos);
+
+    const rockMat = new THREE.MeshStandardMaterial({
+      color: 0x334155,
+      roughness: 0.75,
+      flatShading: true
+    });
+    const deckMat = new THREE.MeshStandardMaterial({
+      color: 0x1e293b,
+      roughness: 0.4,
+      metalness: 0.55
+    });
+    const steelMat = new THREE.MeshStandardMaterial({
+      color: 0x475569,
+      roughness: 0.35,
+      metalness: 0.7
+    });
+
+    // 1. Floating Rock Island Base & Glowing Celestia Ring
+    const islandTop = new THREE.Mesh(new THREE.CylinderGeometry(13.5, 14.5, 1.2, 16), deckMat);
+    islandTop.position.y = -0.5;
+    islandTop.receiveShadow = true;
+    this.skyIslandGroup.add(islandTop);
+
+    const islandUnder = new THREE.Mesh(new THREE.ConeGeometry(13.8, 9.5, 12), rockMat);
+    islandUnder.rotation.x = Math.PI;
+    islandUnder.position.y = -5.8;
+    this.skyIslandGroup.add(islandUnder);
+
+    // Ring of fluffy clouds embracing the floating island
     const cloudMat = new THREE.MeshStandardMaterial({
       color: 0xffffff,
       roughness: 0.9,
       flatShading: true,
       transparent: true,
-      opacity: 0.85
+      opacity: 0.9
+    });
+    for (let i = 0; i < 12; i++) {
+      const ang = (i / 12) * Math.PI * 2;
+      const puff = new THREE.Mesh(new THREE.DodecahedronGeometry(2.6 + (i % 3) * 0.7, 1), cloudMat);
+      puff.position.set(Math.cos(ang) * 14.2, -1.2 + Math.sin(i) * 0.6, Math.sin(ang) * 14.2);
+      this.skyIslandGroup.add(puff);
+    }
+
+    // Glowing gold/pink neon landing ring inside the hangar floor
+    const padRingGeo = new THREE.RingGeometry(4.5, 5.1, 32);
+    padRingGeo.rotateX(-Math.PI / 2);
+    const padRingMat = new THREE.MeshBasicMaterial({
+      color: 0xff2a85,
+      side: THREE.DoubleSide
+    });
+    const padRing = new THREE.Mesh(padRingGeo, padRingMat);
+    padRing.position.y = 0.14;
+    this.skyIslandGroup.add(padRing);
+
+    // 2. Open Military Hangar Structure (Open Front facing +Z so helicopter flies right in!)
+    const hangarW = 14.0;
+    const hangarH = 7.2;
+    const hangarD = 13.0;
+
+    // Back Wall with the Huge Graffiti Mural
+    const backWall = new THREE.Mesh(new THREE.BoxGeometry(hangarW, hangarH, 0.5), steelMat);
+    backWall.position.set(0, hangarH / 2, -hangarD / 2);
+    this.skyIslandGroup.add(backWall);
+
+    const graffitiTex = this.createGraffitiWallTexture();
+    const graffitiMat = new THREE.MeshBasicMaterial({ map: graffitiTex });
+
+    // Inner back wall graffiti mural (13.4m x 6.4m)
+    const muralFront = new THREE.Mesh(new THREE.PlaneGeometry(13.4, 6.4), graffitiMat);
+    muralFront.position.set(0, hangarH / 2, -hangarD / 2 + 0.28);
+    this.skyIslandGroup.add(muralFront);
+
+    // Outer back wall graffiti mural (visible from behind too)
+    const muralBack = new THREE.Mesh(new THREE.PlaneGeometry(13.4, 6.4), graffitiMat);
+    muralBack.position.set(0, hangarH / 2, -hangarD / 2 - 0.28);
+    muralBack.rotation.y = Math.PI;
+    this.skyIslandGroup.add(muralBack);
+
+    // Left and Right Hangar Walls with interior graffiti panels
+    [-hangarW / 2, hangarW / 2].forEach((xSide) => {
+      const sideWall = new THREE.Mesh(new THREE.BoxGeometry(0.5, hangarH, hangarD), steelMat);
+      sideWall.position.set(xSide, hangarH / 2, 0);
+      this.skyIslandGroup.add(sideWall);
+
+      const sideMural = new THREE.Mesh(new THREE.PlaneGeometry(12.2, 6.0), graffitiMat);
+      sideMural.position.set(xSide > 0 ? xSide - 0.28 : xSide + 0.28, hangarH / 2, 0);
+      sideMural.rotation.y = xSide > 0 ? -Math.PI / 2 : Math.PI / 2;
+      this.skyIslandGroup.add(sideMural);
     });
 
-    for (let c = 0; c < 12; c++) {
-      const cloudGroup = new THREE.Group();
-      cloudGroup.position.set(
-        (Math.random() - 0.5) * 220,
-        26 + Math.random() * 10,
-        (Math.random() - 0.5) * 220
+    // Arched / Sloped Hangar Roof
+    const roof = new THREE.Mesh(new THREE.BoxGeometry(hangarW + 1.0, 0.55, hangarD + 1.2), steelMat);
+    roof.position.set(0, hangarH + 0.25, 0);
+    this.skyIslandGroup.add(roof);
+
+    // Front Entrance Neon Frame ("67 HANGAR")
+    const neonPinkMat = new THREE.MeshBasicMaterial({ color: 0xff2a85 });
+    const neonCyanMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8 });
+    const topBar = new THREE.Mesh(new THREE.BoxGeometry(hangarW + 0.6, 0.35, 0.35), neonPinkMat);
+    topBar.position.set(0, hangarH, hangarD / 2);
+    this.skyIslandGroup.add(topBar);
+
+    [-hangarW / 2, hangarW / 2].forEach((xSide) => {
+      const postBar = new THREE.Mesh(new THREE.BoxGeometry(0.35, hangarH, 0.35), neonCyanMat);
+      postBar.position.set(xSide, hangarH / 2, hangarD / 2);
+      this.skyIslandGroup.add(postBar);
+    });
+
+    // 3. Cozy Chill Zone Props inside the Hangar (Couch, Boombox pulsing to 67 beat, Lamp)
+    const couchMat = new THREE.MeshStandardMaterial({ color: 0xdc2626, roughness: 0.6 });
+    const couchBase = new THREE.Mesh(new THREE.BoxGeometry(4.2, 0.7, 1.6), couchMat);
+    couchBase.position.set(-3.8, 0.45, -4.5);
+    this.skyIslandGroup.add(couchBase);
+    const couchBack = new THREE.Mesh(new THREE.BoxGeometry(4.2, 1.4, 0.45), couchMat);
+    couchBack.position.set(-3.8, 0.95, -5.1);
+    this.skyIslandGroup.add(couchBack);
+
+    // Giant Boombox on the right side of the hangar
+    this.hangarBoombox = new THREE.Group();
+    this.hangarBoombox.position.set(4.2, 1.2, -4.4);
+    const boxBody = new THREE.Mesh(
+      new THREE.BoxGeometry(3.2, 1.8, 1.2),
+      new THREE.MeshStandardMaterial({ color: 0x111827, metalness: 0.8, roughness: 0.2 })
+    );
+    this.hangarBoombox.add(boxBody);
+    [-0.9, 0.9].forEach((sx) => {
+      const speaker = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.62, 0.62, 1.26, 16),
+        neonCyanMat
       );
+      speaker.rotation.x = Math.PI / 2;
+      speaker.position.set(sx, 0, 0);
+      this.hangarBoombox.add(speaker);
+    });
+    this.skyIslandGroup.add(this.hangarBoombox);
 
-      for (let s = 0; s < 4; s++) {
-        const puff = new THREE.Mesh(new THREE.DodecahedronGeometry(2.2 + Math.random() * 1.8, 1), cloudMat);
-        puff.position.set((s - 1.5) * 2.2, (Math.random() - 0.5) * 0.8, (Math.random() - 0.5) * 1.2);
-        cloudGroup.add(puff);
-      }
+    // Subtle vertical sky beacon beam below the island so players can spot it in the sky
+    const beamGeo = new THREE.CylinderGeometry(0.35, 1.2, 34, 12, 1, true);
+    const beamMat = new THREE.MeshBasicMaterial({
+      color: 0x38bdf8,
+      transparent: true,
+      opacity: 0.14,
+      side: THREE.DoubleSide,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending
+    });
+    const beam = new THREE.Mesh(beamGeo, beamMat);
+    beam.position.y = -17;
+    this.skyIslandGroup.add(beam);
 
-      this.scene.add(cloudGroup);
-      this.clouds.push({ group: cloudGroup, speed: 1.2 + Math.random() * 1.2 });
+    this.scene.add(this.skyIslandGroup);
+  }
+
+  checkSkyHangar(heliPos, onEnter, onLeave) {
+    const dist = heliPos.distanceTo(this.skyHangarPos);
+    const insideNow = dist < 10.5 && heliPos.y > 28.0;
+    if (insideNow && !this.isInsideSkyHangar) {
+      this.isInsideSkyHangar = true;
+      sound.start67MemeBeat();
+      if (onEnter) onEnter();
+    } else if (!insideNow && this.isInsideSkyHangar) {
+      this.isInsideSkyHangar = false;
+      sound.stop67MemeBeat();
+      if (onLeave) onLeave();
     }
   }
 
   checkStarCollisions(heliPos, onStarCollected) {
-    const collectRadius = 2.8;
+    const collectRadius = 3.1;
     this.stars.forEach((star) => {
       if (!star.collected && heliPos.distanceTo(star.mesh.position) < collectRadius) {
         star.collected = true;
         this.collectedStarsCount++;
         sound.playStarCollect();
-        star.mesh.scale.set(2.0, 2.0, 2.0);
+        star.mesh.scale.set(2.2, 2.2, 2.2);
         star.mesh.material.transparent = true;
         if (onStarCollected) {
           onStarCollected(this.collectedStarsCount, this.totalStars);
@@ -894,7 +1486,7 @@ export class World {
   getHelipadAt(pos, radius = 5.5) {
     for (const pad of this.helipads) {
       const pPos = pad.group.position;
-      if (Math.hypot(pos.x - pPos.x, pos.z - pPos.z) < radius) {
+      if (Math.hypot(pos.x - pPos.x, pos.z - pPos.z) < radius && pos.y < 14.0) {
         return pad.data;
       }
     }
@@ -903,6 +1495,44 @@ export class World {
 
   update(delta) {
     const time = performance.now() * 0.001;
+
+    if (this.waterUniforms) {
+      this.waterUniforms.uTime.value = time;
+    }
+    if (this.skyUniforms) {
+      this.skyUniforms.uTime.value = time;
+    }
+
+    // Animate island shoreline foam rings
+    this.shoreFoamRings.forEach((f) => {
+      const s = 1.0 + Math.sin(time * 2.2 + f.phase) * 0.035;
+      f.mesh.scale.set(s, s, 1);
+      f.mesh.material.opacity = 0.38 + Math.sin(time * 2.2 + f.phase) * 0.22;
+    });
+
+    // Animate wind-swaying grass
+    if (this.grassInstanced && this.grassTransforms) {
+      const dummy = new THREE.Object3D();
+      for (let i = 0; i < this.grassTransforms.length; i++) {
+        const g = this.grassTransforms[i];
+        dummy.position.set(g.x, 0.52, g.z);
+        const sway = Math.sin(time * 2.8 + g.phase) * 0.18;
+        dummy.rotation.set(sway, g.angle, sway * 0.5);
+        dummy.scale.set(g.scale, g.scale, g.scale);
+        dummy.updateMatrix();
+        this.grassInstanced.setMatrixAt(i, dummy.matrix);
+      }
+      this.grassInstanced.instanceMatrix.needsUpdate = true;
+    }
+
+    // Animate Secret Sky Hangar boombox & subtle bob
+    if (this.skyIslandGroup) {
+      this.skyIslandGroup.position.y = this.skyHangarPos.y + Math.sin(time * 1.4) * 0.25;
+    }
+    if (this.hangarBoombox) {
+      const beatPulse = this.isInsideSkyHangar ? (1.0 + Math.abs(Math.sin(time * 17.0)) * 0.22) : 1.0;
+      this.hangarBoombox.scale.set(beatPulse, beatPulse, beatPulse);
+    }
 
     this.turbines.forEach((t) => {
       t.rotor.rotation.z += t.speed * delta;

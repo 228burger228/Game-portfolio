@@ -13,7 +13,8 @@
   <script type="importmap">
     {
       "imports": {
-        "three": "https://cdn.jsdelivr.net/npm/three@0.174.0/build/three.module.js"
+        "three": "https://cdn.jsdelivr.net/npm/three@0.174.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.174.0/examples/jsm/"
       }
     }
   </script>
@@ -51,16 +52,19 @@
         <div class="hud-pad-counter" id="hud-pad-counter" title="Номер текущей станции">
           1 / 10
         </div>
+        <div class="hud-pad-counter" id="hud-altitude" title="Высота полёта (Зажми Space или кликни сюда, чтобы взлететь выше облаков к пасхалке!)">
+          📏 3м
+        </div>
       </div>
 
       <!-- Right: Action Buttons -->
       <div class="top-actions">
-        <div class="hud-stars" id="stars-count" title="Соберите все 10 звёзд на карте!">
+        <div class="hud-stars" id="stars-count" title="Соберите все 10 чекпоинтов (звёзд) на время!">
           ⭐ 0 / 10
         </div>
 
-        <button class="hud-btn" id="btn-theme" title="Переключить время суток (День / Ночь)">
-          🌙 <span class="btn-text">Ночь</span>
+        <button class="hud-btn" id="btn-theme" title="Переключить погоду и время суток (День / Закат Genshin / Туман Rust / Кибер-Ночь)">
+          🌇 <span class="btn-text">Закат</span>
         </button>
 
         <button class="hud-btn" id="btn-camera" title="Сменить ракурс камеры (Клавиша C)">
@@ -81,8 +85,17 @@
       </div>
     </header>
 
+    <!-- SECRET SKY HANGAR 67 GRAFFITI BANNER -->
+    <div class="hangar-67-banner" id="hangar-67-banner" style="display: none;"></div>
+
     <!-- PROXIMITY PROMPT -->
     <div class="proximity-prompt" id="proximity-prompt"></div>
+
+    <!-- TACTICAL MINI-RADAR (Rust / Warpath HUD) -->
+    <div class="radar-widget" title="Тактический радар: цветные точки — острова, жёлтые — чекпоинты ⭐, 67 — секретный небесный ангар">
+      <canvas id="radar-canvas" width="116" height="116"></canvas>
+      <span class="radar-label">RADAR · SPACE ☁️</span>
+    </div>
 
     <!-- TOUCH CONTROLS (Mobile) -->
     <div class="touch-controls" id="touch-controls">
@@ -98,7 +111,7 @@
     <!-- BOTTOM NAVIGATION DOCK WITH PAGING & SCROLLING -->
     <footer class="bottom-dock">
       <div class="dock-controls-hint">
-        🎮 <strong>Навигация:</strong> Кликайте прямо по 3D-островам или кнопкам внизу, крутите колёсико мыши или жмите <span class="key-badge">◀ Пред.</span> / <span class="key-badge">След. ▶</span> · Полёт: <span class="key-badge">W</span><span class="key-badge">A</span><span class="key-badge">S</span><span class="key-badge">D</span> + <span class="key-badge">Shift</span>
+        🎮 <strong>Навигация:</strong> Кликайте по 3D-островам или кнопкам внизу · Полёт: <span class="key-badge">W</span><span class="key-badge">A</span><span class="key-badge">S</span><span class="key-badge">D</span> + <span class="key-badge">Shift</span> · Взлёт в облака: <span class="key-badge">Space</span> (Снижение: <span class="key-badge">Q</span>)
       </div>
 
       <div class="dock-container">

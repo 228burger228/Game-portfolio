@@ -998,6 +998,94 @@ dialog::backdrop {
   line-height: 1.38;
 }
 
+/* SECRET SKY HANGAR 67 GRAFFITI BANNER */
+.hangar-67-banner {
+  position: absolute;
+  top: 78px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 40;
+  pointer-events: auto;
+  animation: fadeSlideUp 0.28s ease-out;
+}
+
+.hangar-67-card {
+  background: linear-gradient(135deg, rgba(24, 24, 27, 0.94), rgba(80, 7, 36, 0.92));
+  border: 2px solid #ff2a85;
+  box-shadow: 0 12px 35px rgba(255, 42, 133, 0.45), 0 0 20px rgba(56, 189, 248, 0.35);
+  border-radius: var(--radius-md);
+  padding: 12px 20px;
+  text-align: center;
+  backdrop-filter: blur(14px);
+}
+
+.hangar-67-top {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  font-size: 0.74rem;
+  font-weight: 800;
+  margin-bottom: 4px;
+}
+
+.hangar-67-tag {
+  color: #facc15;
+  letter-spacing: 0.04em;
+}
+
+.hangar-67-eq {
+  color: #38bdf8;
+  background: rgba(56, 189, 248, 0.16);
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+
+.hangar-67-graffiti {
+  font-size: 1.15rem;
+  font-weight: 900;
+  color: #fff;
+  text-shadow: 0 2px 12px #ff2a85;
+  letter-spacing: 0.02em;
+  margin-bottom: 8px;
+}
+
+.hangar-67-actions {
+  display: flex;
+  justify-content: center;
+}
+
+/* TACTICAL MINI-RADAR WIDGET */
+.radar-widget {
+  position: absolute;
+  bottom: 108px;
+  left: 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  background: rgba(9, 9, 11, 0.72);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  border-radius: 16px;
+  padding: 6px;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  pointer-events: auto;
+}
+
+#radar-canvas {
+  display: block;
+  border-radius: 50%;
+  border: 1px solid rgba(56, 189, 248, 0.45);
+}
+
+.radar-label {
+  font-size: 0.63rem;
+  font-weight: 800;
+  color: #7dd3fc;
+  letter-spacing: 0.06em;
+}
+
 @media (max-width: 860px) {
   .btn-text { display: none; }
   .hud-center { display: none; }
@@ -1005,5 +1093,7 @@ dialog::backdrop {
   .profile-role { display: none; }
   .dock-controls-hint { display: none; }
   .yt-ecosystem-grid { grid-template-columns: 1fr; }
+  .radar-widget { display: none; }
 }
+
 

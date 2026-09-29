@@ -457,8 +457,8 @@ export class Helicopter {
     }
     this.group.add(this.tailRotorGroup);
 
-    // ─── 9. TACTICAL NAVIGATION & STROBE LIGHTS ───
-    const bulbGeo = new THREE.SphereGeometry(0.06, 6, 6);
+    // ─── 9. TACTICAL NAVIGATION, STROBE & AFTERBURNER VORTEX VFX ───
+    const bulbGeo = new THREE.SphereGeometry(0.06, 8, 8);
     const portLight = new THREE.Mesh(bulbGeo, new THREE.MeshBasicMaterial({ color: 0xff2244 }));
     portLight.position.set(-1.82, 0.92, 0.25);
     this.group.add(portLight);
@@ -470,10 +470,28 @@ export class Helicopter {
     this.beaconLight = new THREE.Mesh(bulbGeo, new THREE.MeshBasicMaterial({ color: 0xffffff }));
     this.beaconLight.position.set(0, 2.18, 4.35);
     this.group.add(this.beaconLight);
+
+    // Twin Turbine Afterburner Glow Cones (for Bloom & Turbo/Autopilot)
+    this.afterburners = [];
+    const flameMat = new THREE.MeshBasicMaterial({
+      color: 0x38bdf8,
+      transparent: true,
+      opacity: 0.75,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false
+    });
+    [-0.52, 0.52].forEach((xPos) => {
+      const coneGeo = new THREE.ConeGeometry(0.16, 1.1, 12);
+      coneGeo.rotateX(Math.PI / 2);
+      const flame = new THREE.Mesh(coneGeo, flameMat.clone());
+      flame.position.set(xPos, 1.38, 1.85);
+      this.group.add(flame);
+      this.afterburners.push(flame);
+    });
   }
 
   buildSearchlight() {
-    this.searchlight = new THREE.SpotLight(0xfffbeb, 5.0, 45, Math.PI / 5, 0.4, 1.4);
+    this.searchlight = new THREE.SpotLight(0xfffbeb, 6.5, 52, Math.PI / 5, 0.4, 1.3);
     this.searchlight.position.set(0, 0.45, -2.5);
     this.searchlight.target.position.set(0, -8, -16);
     this.group.add(this.searchlight);
@@ -481,31 +499,41 @@ export class Helicopter {
   }
 
   buildDownwashEffect() {
-    const ringGeo = new THREE.RingGeometry(1.8, 4.6, 32);
+    const ringGeo = new THREE.RingGeometry(1.5, 4.8, 48);
     ringGeo.rotateX(-Math.PI / 2);
 
     const canvas = document.createElement('canvas');
-    canvas.width = 128;
-    canvas.height = 128;
+    canvas.width = 256;
+    canvas.height = 256;
     const ctx = canvas.getContext('2d');
-    const grad = ctx.createRadialGradient(64, 64, 20, 64, 64, 64);
-    grad.addColorStop(0, 'rgba(255, 255, 255, 0.42)');
-    grad.addColorStop(0.5, 'rgba(255, 255, 255, 0.18)');
+    const grad = ctx.createRadialGradient(128, 128, 32, 128, 128, 126);
+    grad.addColorStop(0, 'rgba(255, 255, 255, 0.0)');
+    grad.addColorStop(0.35, 'rgba(224, 242, 254, 0.55)');
+    grad.addColorStop(0.65, 'rgba(56, 189, 248, 0.28)');
+    grad.addColorStop(0.88, 'rgba(255, 255, 255, 0.45)');
     grad.addColorStop(1, 'rgba(255, 255, 255, 0)');
     ctx.fillStyle = grad;
-    ctx.fillRect(0, 0, 128, 128);
+    ctx.fillRect(0, 0, 256, 256);
 
     const texture = new THREE.CanvasTexture(canvas);
     this.downwashMat = new THREE.MeshBasicMaterial({
       map: texture,
       transparent: true,
       opacity: 0,
-      depthWrite: false
+      depthWrite: false,
+      blending: THREE.AdditiveBlending
     });
 
     this.downwashRing = new THREE.Mesh(ringGeo, this.downwashMat);
-    this.downwashRing.position.set(0, 0.06, 0);
+    this.downwashRing.position.set(0, 0.08, 0);
     this.scene.add(this.downwashRing);
+
+    const outerGeo = new THREE.RingGeometry(3.8, 6.8, 48);
+    outerGeo.rotateX(-Math.PI / 2);
+    this.downwashOuterMat = this.downwashMat.clone();
+    this.downwashOuterRing = new THREE.Mesh(outerGeo, this.downwashOuterMat);
+    this.downwashOuterRing.position.set(0, 0.07, 0);
+    this.scene.add(this.downwashOuterRing);
   }
 
   startAutopilotFlight(fromPos, toPad, onComplete) {
@@ -521,7 +549,7 @@ export class Helicopter {
     this.autopilotTotalDist = start.distanceTo(end);
 
     // Lower arc for short hops, sleek combat arc for long flights
-    const cruiseAlt = Math.min(13.5, Math.max(6.5, this.autopilotTotalDist * 0.14 + 4.5));
+    const cruiseAlt = Math.min(14.5, Math.max(6.5, this.autopilotTotalDist * 0.14 + 4.5));
 
     const mid1 = new THREE.Vector3(
       THREE.MathUtils.lerp(start.x, end.x, 0.25),
@@ -537,7 +565,7 @@ export class Helicopter {
 
     this.autopilotCurve = new THREE.CubicBezierCurve3(start, mid1, mid2, end);
 
-    // MUCH FASTER flight duration even to the farthest pads (0.95s to 1.65s max!)
+    // Fast flight duration even to the farthest pads (0.9s to 1.65s max!)
     this.autopilotDuration = Math.max(0.9, Math.min(1.65, this.autopilotTotalDist * 0.011 + 0.72));
   }
 
@@ -607,6 +635,18 @@ export class Helicopter {
     const blurOpacity = THREE.MathUtils.smoothstep(this.rotorRpm, 18, this.maxRpm) * 0.38;
     this.rotorDisc.material.opacity = blurOpacity;
 
+    // Update Twin Turbine Afterburner Glow
+    const speedFactor = this.isAutopilot ? 1.0 : Math.min(1.0, this.velocity.length() / 32.0);
+    if (this.afterburners) {
+      this.afterburners.forEach((flame, idx) => {
+        const flicker = 0.85 + Math.sin(time * 42 + idx * 3) * 0.22;
+        const scaleZ = (0.35 + speedFactor * 1.15) * flicker;
+        flame.scale.set(1, 1, scaleZ);
+        flame.material.opacity = (0.18 + speedFactor * 0.72) * flicker;
+        flame.material.color.setHex(input?.turbo || this.isAutopilot ? 0x38bdf8 : 0xf59e0b);
+      });
+    }
+
     // Apply transform
     this.group.position.copy(this.position);
     this.group.rotation.set(0, 0, 0);
@@ -614,14 +654,23 @@ export class Helicopter {
     this.group.rotateX(this.currentPitch);
     this.group.rotateZ(this.currentRoll);
 
-    // Downwash ring
-    if (this.downwashRing) {
-      this.downwashRing.position.set(this.position.x, 0.08, this.position.z);
+    // Dual Animated Rotor Downwash Rings on Water/Ground
+    if (this.downwashRing && this.downwashOuterRing) {
+      this.downwashRing.position.set(this.position.x, 0.09, this.position.z);
+      this.downwashOuterRing.position.set(this.position.x, 0.07, this.position.z);
       const altitude = Math.max(0.1, this.position.y);
-      const intensity = Math.max(0, 1 - altitude / 14) * (this.rotorRpm / this.maxRpm);
-      this.downwashMat.opacity = intensity * 0.6;
-      const pulse = 1.0 + Math.sin(time * 20) * 0.08;
-      this.downwashRing.scale.set(pulse, pulse, pulse);
+      const intensity = Math.max(0, 1 - altitude / 16) * (this.rotorRpm / this.maxRpm);
+
+      const wave1 = (time * 1.8) % 1.0;
+      const wave2 = (time * 1.8 + 0.5) % 1.0;
+
+      const s1 = 0.65 + wave1 * 0.85;
+      this.downwashRing.scale.set(s1, s1, 1);
+      this.downwashMat.opacity = intensity * (1.0 - wave1) * 0.75;
+
+      const s2 = 0.65 + wave2 * 0.85;
+      this.downwashOuterRing.scale.set(s2, s2, 1);
+      this.downwashOuterMat.opacity = intensity * (1.0 - wave2) * 0.55;
     }
   }
 
@@ -655,12 +704,11 @@ export class Helicopter {
     if (isMovingForward) throttle += 1;
     if (isMovingBack) throttle -= 0.65;
 
-    const acceleration = input.turbo ? 85.0 : 52.0;
+    const acceleration = input.turbo ? 88.0 : 54.0;
     if (throttle !== 0) {
       this.velocity.addScaledVector(forwardVec, throttle * acceleration * delta);
     }
 
-    // Forward tilt when flying forward (-X rotation pitches nose down since nose is -Z)
     const targetPitch = -throttle * 0.28;
     this.currentPitch = THREE.MathUtils.lerp(this.currentPitch, targetPitch, delta * 5.0);
 
@@ -670,22 +718,34 @@ export class Helicopter {
 
     const hoverBaseY = 4.8;
     if (!this.isLanded && vertThrottle === 0) {
-      const dy = hoverBaseY - this.position.y;
-      this.velocity.y += dy * 3.0 * delta;
+      // Only auto-lift to 4.8m on initial low-altitude takeoff; hold high altitude when above clouds!
+      if (this.position.y < hoverBaseY) {
+        const dy = hoverBaseY - this.position.y;
+        this.velocity.y += dy * 3.2 * delta;
+      } else {
+        this.velocity.y *= Math.pow(0.82, delta * 60);
+      }
     } else {
-      this.velocity.y += vertThrottle * 26.0 * delta;
+      // Fast vertical climb/descent so player can easily reach the Sky Hangar at Y=35!
+      this.velocity.y += vertThrottle * 34.0 * delta;
     }
 
     this.velocity.x *= Math.pow(0.91, delta * 60);
     this.velocity.z *= Math.pow(0.91, delta * 60);
     this.velocity.y *= Math.pow(0.89, delta * 60);
 
-    const maxSpeed = input.turbo ? 68.0 : 42.0;
+    const maxSpeed = input.turbo ? 70.0 : 44.0;
     if (this.velocity.length() > maxSpeed) {
       this.velocity.setLength(maxSpeed);
     }
 
     this.position.addScaledVector(this.velocity, delta);
+
+    // Clamp max altitude at 52m (above clouds & sky island at 35m)
+    if (this.position.y > 52.0) {
+      this.position.y = 52.0;
+      this.velocity.y = Math.min(0, this.velocity.y);
+    }
 
     const groundFloor = 0.85;
     if (this.position.y < groundFloor) {

@@ -12,7 +12,13 @@ export class UI {
 
     this.activePadId = 'hq';
     this.isMuted = sound.isMuted;
-    this.isNight = false;
+    this.weatherMode = 0; // 0: Day, 1: Sunset, 2: Fog Dawn, 3: Night
+    this.weatherLabels = [
+      '🌇 <span class="btn-text">Закат</span>',
+      '🌫️ <span class="btn-text">Туман</span>',
+      '🌌 <span class="btn-text">Ночь</span>',
+      '☀️ <span class="btn-text">День</span>'
+    ];
     this.cameraModeName = 'Следование';
     this.currentGalleryIdx = 0;
 
@@ -24,6 +30,7 @@ export class UI {
   initElements() {
     this.hudPadName = document.getElementById('hud-pad-name');
     this.hudPadCounter = document.getElementById('hud-pad-counter');
+    this.hudAltitude = document.getElementById('hud-altitude');
     this.flightModeBadge = document.getElementById('flight-mode-badge');
     this.starsCountEl = document.getElementById('stars-count');
     this.muteBtn = document.getElementById('btn-mute');
@@ -39,6 +46,8 @@ export class UI {
     this.scrollRightBtn = document.getElementById('btn-scroll-right');
     this.touchControls = document.getElementById('touch-controls');
     this.proximityPrompt = document.getElementById('proximity-prompt');
+    this.hangarBanner = document.getElementById('hangar-67-banner');
+    this.radarCanvas = document.getElementById('radar-canvas');
 
     this.updateMuteButtonUI();
   }
@@ -137,11 +146,9 @@ export class UI {
     if (this.themeBtn) {
       this.themeBtn.addEventListener('click', () => {
         sound.playClick();
-        this.isNight = !this.isNight;
-        this.themeBtn.innerHTML = this.isNight
-          ? '☀️ <span class="btn-text">День</span>'
-          : '🌙 <span class="btn-text">Ночь</span>';
-        if (this.onToggleTheme) this.onToggleTheme(this.isNight);
+        this.weatherMode = (this.weatherMode + 1) % 4;
+        this.themeBtn.innerHTML = this.weatherLabels[this.weatherMode];
+        if (this.onToggleTheme) this.onToggleTheme(this.weatherMode);
       });
     }
 
@@ -222,9 +229,222 @@ export class UI {
     }
   }
 
-  updateStarsCount(count, total) {
+  updateAltitude(altY, onFlyToSkyHangar) {
+    if (!this.hudAltitude) return;
+    const meters = Math.max(1, Math.round(altY * 2.5));
+    const aboveClouds = altY > 18.0;
+    this.hudAltitude.textContent = aboveClouds ? `☁️ ${meters}м (В облаках!)` : `📏 ${meters}м`;
+    this.hudAltitude.style.borderColor = aboveClouds ? '#ff2a85' : 'rgba(255,255,255,0.14)';
+    this.hudAltitude.style.color = aboveClouds ? '#fbcfe8' : '#a1a1aa';
+    if (onFlyToSkyHangar && !this.hudAltitude._boundClick) {
+      this.hudAltitude._boundClick = true;
+      this.hudAltitude.style.cursor = 'pointer';
+      this.hudAltitude.onclick = () => {
+        sound.playClick();
+        onFlyToSkyHangar();
+      };
+    }
+  }
+
+  showSkyHangarBanner() {
+    if (!this.hangarBanner) return;
+    this.hangarBanner.style.display = 'flex';
+    this.hangarBanner.innerHTML = `
+      <div class="hangar-67-card">
+        <div class="hangar-67-top">
+          <span class="hangar-67-tag">👑 ПАСХАЛКА НАЙДЕНА · SECRET HANGAR 67</span>
+          <span class="hangar-67-eq">🎵 67 BEAT PLAYING ▂▄▆█▃</span>
+        </div>
+        <div class="hangar-67-graffiti">«ТЫ ЧЁ ЗАБЫЛ ЗДЕСЬ?! ДАЙ ОТДОХНУТЬ НОРМАЛЬНО!»</div>
+        <div class="hangar-67-actions">
+          <button type="button" id="btn-toggle-67" class="btn-pill">🔇 Пауза / Вкл бит 67</button>
+        </div>
+      </div>
+    `;
+    const btn = document.getElementById('btn-toggle-67');
+    if (btn) {
+      btn.onclick = () => {
+        if (sound.isPlaying67) {
+          sound.stop67MemeBeat();
+          btn.textContent = '🔊 Включить бит 67';
+        } else {
+          sound.start67MemeBeat();
+          btn.textContent = '🔇 Пауза бита 67';
+        }
+      };
+    }
+  }
+
+  hideSkyHangarBanner() {
+    if (this.hangarBanner) {
+      this.hangarBanner.style.display = 'none';
+    }
+  }
+
+  openVictoryModal(elapsedSeconds, onResetStars) {
+    if (!this.projectModal) return;
+    const modalContent = document.getElementById('modal-card-content');
+    if (!modalContent) return;
+
+    const mins = Math.floor(elapsedSeconds / 60);
+    const secs = (elapsedSeconds % 60).toFixed(1);
+    const timeStr = mins > 0 ? `${mins} мин ${secs} сек` : `${secs} сек`;
+    const rank = elapsedSeconds < 45 ? 'S+ · Бог Пилотажа ⚡' : (elapsedSeconds < 90 ? 'S · Ас Неба 🏆' : 'A · Опытный Пилот ⭐');
+
+    modalContent.innerHTML = `
+      <div class="modal-card__header" style="border-top-color: #facc15; text-align: center; padding-top: 16px;">
+        <div style="font-size: 3rem; margin-bottom: 6px;">🏆✨</div>
+        <h2 class="modal-card__title" style="color: #fde047; font-size: 1.5rem;">
+          Красавчик! Ты молодец — собрал все 10 чекпоинтов!
+        </h2>
+        <p class="modal-card__subtitle" style="margin-top: 4px;">
+          Все золотые звёзды архипелага портфолио собраны!
+        </p>
+      </div>
+
+      <div class="modal-card__body" style="text-align: center;">
+        <div class="modal-card__stats" style="justify-content: center; margin: 14px 0;">
+          <div class="stat-pill" style="border-color: rgba(250, 204, 21, 0.45); background: rgba(250, 204, 21, 0.1);">
+            <span class="stat-pill__label">⏱️ Твоё время</span>
+            <strong class="stat-pill__value" style="color: #fde047; font-size: 1.2rem;">${timeStr}</strong>
+          </div>
+          <div class="stat-pill" style="border-color: rgba(56, 189, 248, 0.45); background: rgba(56, 189, 248, 0.1);">
+            <span class="stat-pill__label">🎖️ Ранг пилота</span>
+            <strong class="stat-pill__value" style="color: #38bdf8; font-size: 1.05rem;">${rank}</strong>
+          </div>
+          <div class="stat-pill">
+            <span class="stat-pill__label">⭐ Чекпоинтов</span>
+            <strong class="stat-pill__value">10 / 10 (100%)</strong>
+          </div>
+        </div>
+        <p style="font-size: 0.86rem; color: #d4d4d8; margin-bottom: 14px;">
+          💡 <em>Секретная подсказка:</em> А ты уже взлетал на клавишу <b>Space</b> выше облаков над центром карты? Там на высоте <b>85+ метров</b> спрятан парящий остров с ангаром <b>«67»</b>!
+        </p>
+      </div>
+
+      <div class="modal-card__actions" style="justify-content: center;">
+        <button class="btn btn--primary" id="btn-victory-reset" style="background: #eab308; color: #09090b;">
+          🔄 Собрать заново на новый рекорд
+        </button>
+        <button class="btn btn--secondary" id="btn-victory-close">
+          🚁 Продолжить полёт
+        </button>
+      </div>
+    `;
+
+    document.getElementById('btn-victory-close').onclick = () => this.closeProjectModal();
+    document.getElementById('btn-victory-reset').onclick = () => {
+      this.closeProjectModal();
+      if (onResetStars) onResetStars();
+    };
+
+    this.projectModal.showModal();
+  }
+
+  updateRadar(heliPos, heliYaw, stars, skyHangarPos) {
+    if (!this.radarCanvas) return;
+    const ctx = this.radarCanvas.getContext('2d');
+    const w = this.radarCanvas.width;
+    const h = this.radarCanvas.height;
+    const cx = w / 2;
+    const cy = h / 2;
+    const r = cx - 4;
+    const scale = r / 95; // 95 world units radius on radar
+
+    ctx.clearRect(0, 0, w, h);
+
+    // Radar circular background
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, 0, Math.PI * 2);
+    ctx.clip();
+
+    ctx.fillStyle = 'rgba(9, 13, 22, 0.82)';
+    ctx.fillRect(0, 0, w, h);
+
+    // Radar concentric rings & crosshair
+    ctx.strokeStyle = 'rgba(56, 189, 248, 0.18)';
+    ctx.lineWidth = 1;
+    [0.35, 0.7, 1.0].forEach((frac) => {
+      ctx.beginPath();
+      ctx.arc(cx, cy, r * frac, 0, Math.PI * 2);
+      ctx.stroke();
+    });
+    ctx.beginPath();
+    ctx.moveTo(cx, 0); ctx.lineTo(cx, h);
+    ctx.moveTo(0, cy); ctx.lineTo(w, cy);
+    ctx.stroke();
+
+    // Draw islands (HELIPADS)
+    HELIPADS.forEach((pad) => {
+      const px = cx + pad.position.x * scale;
+      const py = cy + pad.position.z * scale;
+      ctx.fillStyle = pad.color || '#38bdf8';
+      ctx.beginPath();
+      ctx.arc(px, py, pad.id === this.activePadId ? 4.2 : 2.8, 0, Math.PI * 2);
+      ctx.fill();
+    });
+
+    // Draw uncollected stars (yellow dots)
+    if (stars) {
+      ctx.fillStyle = '#fde047';
+      stars.forEach((s) => {
+        if (!s.collected) {
+          const sx = cx + s.mesh.position.x * scale;
+          const sy = cy + s.mesh.position.z * scale;
+          ctx.beginPath();
+          ctx.arc(sx, sy, 2.1, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      });
+    }
+
+    // Draw Secret Sky Hangar "67" marker
+    if (skyHangarPos) {
+      const hx = cx + skyHangarPos.x * scale;
+      const hz = cy + skyHangarPos.z * scale;
+      ctx.fillStyle = '#ff2a85';
+      ctx.font = 'bold 9px monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText('67', hx, hz - 3);
+    }
+
+    // Draw Helicopter position & heading cone
+    const heliX = cx + heliPos.x * scale;
+    const heliY = cy + heliPos.z * scale;
+
+    ctx.save();
+    ctx.translate(heliX, heliY);
+    ctx.rotate(-heliYaw);
+
+    // View cone
+    ctx.fillStyle = 'rgba(239, 68, 68, 0.22)';
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+    ctx.lineTo(-10, -22);
+    ctx.lineTo(10, -22);
+    ctx.closePath();
+    ctx.fill();
+
+    // Heli pointer triangle
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath();
+    ctx.moveTo(0, -5);
+    ctx.lineTo(-3.5, 4);
+    ctx.lineTo(3.5, 4);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+
+    ctx.restore();
+  }
+
+  updateStarsCount(count, total, elapsedSec = null) {
     if (this.starsCountEl) {
-      this.starsCountEl.textContent = `⭐ ${count} / ${total}`;
+      const timeBadge = (elapsedSec !== null && count > 0 && count < total)
+        ? ` · ⏱️ ${Math.floor(elapsedSec)}с`
+        : '';
+      this.starsCountEl.textContent = `⭐ ${count} / ${total}${timeBadge}`;
       this.starsCountEl.classList.add('bounce');
       setTimeout(() => this.starsCountEl.classList.remove('bounce'), 350);
     }
