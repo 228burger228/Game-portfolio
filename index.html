@@ -85,22 +85,29 @@
       </div>
     </header>
 
-    <!-- FLOATING MONDSTADT GUIDE & QUICK NAVIGATION WINDOW -->
+    <!-- FLOATING MONDSTADT EMPLOYER GUIDE & QUICK NAVIGATION WINDOW -->
     <aside class="guide-widget" id="guide-widget">
       <div class="guide-widget__header">
-        <span class="guide-widget__title">🧭 Путеводитель · Что делать?</span>
-        <button type="button" class="guide-widget__toggle" id="btn-toggle-guide" title="Свернуть / Развернуть памятку">—</button>
+        <span class="guide-widget__title">💼 Путеводитель для работодателя</span>
+        <button type="button" class="guide-widget__toggle" id="btn-toggle-guide" title="Свернуть / Развернуть путеводитель">—</button>
       </div>
       <div class="guide-widget__body" id="guide-widget-body">
+        <div class="guide-employer-meta">
+          <strong>Дмитрий Бургер</strong> · Product Frontend &amp; UI/UX Lead
+          <span>Vue 3 · TypeScript · Three.js · System Design · Lighthouse 95+</span>
+        </div>
         <ul class="guide-steps">
-          <li><strong>1. Острова-кейсы:</strong> кликай по островам или кнопкам внизу для автопилота (или летай сам на <span class="key-badge">W</span><span class="key-badge">A</span><span class="key-badge">S</span><span class="key-badge">D</span>).</li>
-          <li><strong>2. Спидран ⭐ 10/10:</strong> собери все золотые звёзды над островами на рекорд времени!</li>
-          <li><strong>3. Пасхалка 67 ☁️:</strong> зажми <span class="key-badge">Space</span> и взлети <b>выше облаков</b> (90м) в секретный ангар под трек <em>Gazan — 67</em>!</li>
+          <li><strong>⚡ Быстрый просмотр (за 1 мин):</strong> выбирайте станции ниже или в док-панели внизу — автопилот за 1 сек откроет карточку кейса, где можно листать все проекты кнопками <b>«◀ Пред. / След. ▶»</b> без ручного полёта.</li>
+          <li><strong>📊 Ориентация на метрики:</strong> в каждом кейсе показаны реальные цифры бизнеса (<i>Было → Архитектурное решение → Рост конверсии и трафика</i>).</li>
+          <li><strong>🕹️ 3D-интерактив:</strong> свободный полёт на <span class="key-badge">W</span><span class="key-badge">A</span><span class="key-badge">S</span><span class="key-badge">D</span>, смена освещения и секретный уровень выше облаков (<span class="key-badge">Space</span>).</li>
         </ul>
+        <div class="guide-section-label">Быстрый переход к ключевым разделам:</div>
         <div class="guide-quick-actions">
-          <button type="button" class="guide-action-btn" id="btn-guide-hq">🏰 01. Штаб</button>
-          <button type="button" class="guide-action-btn" id="btn-guide-yt">▶️ 04. YouTube</button>
-          <button type="button" class="guide-action-btn guide-action-btn--secret" id="btn-guide-67">☁️ Взлететь в Ангар 67</button>
+          <button type="button" class="guide-action-btn" id="btn-guide-hq">📄 01. Резюме и стек</button>
+          <button type="button" class="guide-action-btn" id="btn-guide-case">🏗️ 02. B2B Кейс HgStroy</button>
+          <button type="button" class="guide-action-btn" id="btn-guide-ai">🤖 07. AI &amp; Архитектура</button>
+          <button type="button" class="guide-action-btn" id="btn-guide-contact">✉️ 10. Контакты и ТЗ</button>
+          <button type="button" class="guide-action-btn guide-action-btn--secret" id="btn-guide-67">☁️ Бонус: Секретный 3D-ангар (Выше облаков)</button>
         </div>
       </div>
     </aside>
@@ -166,39 +173,47 @@
   <dialog id="help-modal">
     <div class="help-card">
       <div class="help-header">
-        <h3>🧭 Путеводитель и Навигация по Архипелагу</h3>
+        <h3>💼 Путеводитель для работодателя, HR и Tech Lead</h3>
         <button class="modal-close-btn" onclick="document.getElementById('help-modal').close()">✕</button>
       </div>
 
       <div class="help-grid">
         <div class="help-item">
-          <div class="help-icon">🚁</div>
+          <div class="help-icon">⚡</div>
           <div>
-            <h4>1. Автопилот в 1 клик или ручной полёт</h4>
-            <p>Кликайте прямо на любой 3D-остров в мире, выбирайте из 10 локаций в нижней панели или летайте вручную на <span class="key-badge">W</span> <span class="key-badge">A</span> <span class="key-badge">S</span> <span class="key-badge">D</span> (<span class="key-badge">Shift</span> — ускорение).</p>
+            <h4>1. Экспресс-скрининг за 60 секунд (без ручного полёта)</h4>
+            <p>Для быстрого знакомства с опытом нажмите на любую из <strong>10 станций</strong> в нижней панели или в виджете слева. Внутри открывшейся карточки вы можете последовательно листать все проекты кнопками <strong>«◀ Пред. / След. ▶»</strong>, переходя по живым ссылкам и репозиториям.</p>
           </div>
         </div>
 
         <div class="help-item">
-          <div class="help-icon">⭐</div>
+          <div class="help-icon">📊</div>
           <div>
-            <h4>2. Спидран-челлендж: собери 10 звёзд на время</h4>
-            <p>Над каждым островом парит золотая звезда. Соберите все <strong>10 / 10</strong>, чтобы увидеть итоговое время прохождения и получить ранг пилота <strong>S+</strong>!</p>
+            <h4>2. Продуктовый фокус: Было → Решение → Бизнес-результат</h4>
+            <p>Каждая локация раскрывает конкретный коммерческий или R&amp;D кейс: B2B-платформа <strong>HgStroy</strong> (+41% конверсии), аналитическая база <strong>Warpath Wiki</strong> (49 000+ просмотров, работа в международной команде), EdTech-сервис <strong>Study Up</strong>, AI-ассистент <strong>Dmitry OS</strong> (Cloudflare Workers + LLM) и продуктовый e-commerce <strong>foodiCE</strong>.</p>
           </div>
         </div>
 
         <div class="help-item">
-          <div class="help-icon">☁️</div>
+          <div class="help-icon">🛠️</div>
           <div>
-            <h4>3. Секретный Небесный Ангар «67» выше облаков</h4>
-            <p>Зажмите <span class="key-badge">Space</span> (или нажмите кнопку <strong>«☁️ Взлететь в Ангар 67»</strong> в путеводителе слева), чтобы подняться выше облаков к секретному ангару с граффити и треком <em>Gazan — 67 (Six Seven)</em>!</p>
+            <h4>3. Техническая архитектура этого 3D-портфолио</h4>
+            <p>Спроектировано с нуля на чистом <strong>Three.js + Vite</strong> без сторонних тяжёлых игровых движков: процедурная генерация мира, кастомные <strong>GLSL-шейдеры</strong> воды и неба, селективный HDR Bloom, <code>InstancedMesh</code>-оптимизация травы и стабильные <strong>60 FPS</strong> в браузере.</p>
+          </div>
+        </div>
+
+        <div class="help-item">
+          <div class="help-icon">🕹️</div>
+          <div>
+            <h4>4. Интерактивный режим и бонусы</h4>
+            <p>Свободное управление вертолётом (<span class="key-badge">W</span><span class="key-badge">A</span><span class="key-badge">S</span><span class="key-badge">D</span> + <span class="key-badge">Shift</span>), смена атмосферы (День / Закат / Туман / Ночь), сбор 10 чекпоинтов на время и парящий секретный ангар выше облаков (зажмите <span class="key-badge">Space</span> до высоты 90м).</p>
           </div>
         </div>
       </div>
 
       <div style="text-align: center; margin-top: 10px;">
         <button class="btn btn--primary" onclick="document.getElementById('help-modal').close()" style="background: #d3bc8e; color: #161b26; width: 100%; font-weight: 800;">
-          Понятно, в полёт! 🚁
+          Перейти к просмотру кейсов 🚁
         </button>
       </div>
     </div>

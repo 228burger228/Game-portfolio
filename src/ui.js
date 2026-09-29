@@ -53,7 +53,9 @@ export class UI {
     this.guideWidgetBody = document.getElementById('guide-widget-body');
     this.toggleGuideBtn = document.getElementById('btn-toggle-guide');
     this.guideHqBtn = document.getElementById('btn-guide-hq');
-    this.guideYtBtn = document.getElementById('btn-guide-yt');
+    this.guideCaseBtn = document.getElementById('btn-guide-case');
+    this.guideAiBtn = document.getElementById('btn-guide-ai');
+    this.guideContactBtn = document.getElementById('btn-guide-contact');
     this.guide67Btn = document.getElementById('btn-guide-67');
 
     this.updateMuteButtonUI();
@@ -192,21 +194,19 @@ export class UI {
       });
     }
 
-    if (this.guideHqBtn) {
-      this.guideHqBtn.addEventListener('click', () => {
+    const bindGuideJump = (btn, padId, fallbackIdx) => {
+      if (!btn) return;
+      btn.addEventListener('click', () => {
         sound.playClick();
-        const pad = HELIPADS.find(p => p.id === 'hq') || HELIPADS[0];
+        const pad = HELIPADS.find(p => p.id === padId) || HELIPADS[fallbackIdx];
         if (pad && this.onSelectPad) this.onSelectPad(pad);
       });
-    }
+    };
 
-    if (this.guideYtBtn) {
-      this.guideYtBtn.addEventListener('click', () => {
-        sound.playClick();
-        const pad = HELIPADS.find(p => p.id === 'youtube') || HELIPADS[3];
-        if (pad && this.onSelectPad) this.onSelectPad(pad);
-      });
-    }
+    bindGuideJump(this.guideHqBtn, 'hq', 0);
+    bindGuideJump(this.guideCaseBtn, 'hgstroy', 1);
+    bindGuideJump(this.guideAiBtn, 'ai', 6);
+    bindGuideJump(this.guideContactBtn, 'contact', 9);
 
     if (this.guide67Btn) {
       this.guide67Btn.addEventListener('click', () => {
