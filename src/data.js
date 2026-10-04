@@ -9,7 +9,7 @@ export const PORTFOLIO_INFO = {
   studioBot: "https://t.me/dmitryB_studio_bot",
   portfolioUrl: "https://228burger228.github.io/burgerportfolio2.0/",
   avatar: "./assets/mefoto.jpg",
-  tagline: "Собираю хаос требований в работающую систему · Lighthouse 95+ · 15+ проектов в проде"
+  tagline: "Собираю хаос требований в работающую систему · Lighthouse 95+ · 17+ проектов в проде"
 };
 
 export const HELIPADS = [
@@ -385,6 +385,76 @@ export const HELIPADS = [
       { text: "💬 WarpathHub TG", url: "https://t.me/WarpathHub" }
     ],
     image: "./assets/mefoto3.jpg"
+  },
+  {
+    id: "europath",
+    number: "11",
+    name: "EuroPath · Навигатор ВУЗов",
+    shortTitle: "EuroPath (EU)",
+    themeType: "europath",
+    category: "Featured · EdTech & React 19",
+    badge: "React 19 · EdTech",
+    color: "#0284c7",
+    accentGlow: 0x0284c7,
+    position: { x: -64, y: 0.5, z: -4 },
+    emoji: "🎓",
+    title: "EuroPath — Интерактивный навигатор высшего образования в Европе",
+    subtitle: "Frontend Architect & UI/UX Designer · React 19 + Tailwind CSS v4 (2026)",
+    description: "Интерактивная EdTech-платформа для абитуриентов европейских университетов: атлас 13 стран, каталог программ с фильтрами по бесплатному обучению (0 €) и грантам, профориентационный тест совместимости и калькулятор расходов (DSU, DAAD). Разработано на новейшем React 19.",
+    caseFlow: {
+      was: "Сотни разрозненных сайтов пособий, языковые барьеры и хаос в требованиях европейских ВУЗов.",
+      result: "Подбор программы за 5 минут вместо недель: персональный расчет совместимости, стипендии DSU и DAAD.",
+      became: "Автономный SPA-навигатор на React 19 с 3D-карточками, акварельными переходами и $0 на инфраструктуру."
+    },
+    tags: ["React 19", "Tailwind CSS v4", "Vite", "3D Cards", "Калькулятор стипендий", "LocalStorage", "EdTech"],
+    stats: [
+      { label: "Стек", value: "React 19 + Vite" },
+      { label: "Охват", value: "13 стран Европы" },
+      { label: "Инфраструктура", value: "$0 / месяц" }
+    ],
+    linkText: "Открыть EuroPath ↗",
+    link: "https://228burger228.github.io/school-333/docs/index.html",
+    secondaryLinkText: "Репозиторий GitHub ↗",
+    secondaryLink: "https://github.com/228burger228/school-333",
+    image: "./assets/europath.jpg",
+    gallery: [
+      { src: "./assets/europath.jpg", caption: "EuroPath — Интерактивный навигатор высшего образования в Европе (React 19)" }
+    ]
+  },
+  {
+    id: "ainala",
+    number: "12",
+    name: "Ainala Rehab · MedTech",
+    shortTitle: "Ainala Rehab",
+    themeType: "rehab",
+    category: "Featured · MedTech & HealthTech SPA",
+    badge: "MedTech MVP · React",
+    color: "#0b8a8f",
+    accentGlow: 0x0b8a8f,
+    position: { x: 60, y: 0.5, z: -48 },
+    emoji: "🩺",
+    title: "Ainala Rehab — Цифровая платформа безопасной реабилитации",
+    subtitle: "Product Lead & Frontend Developer · React 18 + Recharts + Web Audio API (2026)",
+    description: "MedTech веб-сервис для безопасного восстановления после травм и операций. Персональный дашборд ЛФК по фазам, интерактивный таймер тренировок на чистом редьюсере, трекер боли и симптомов с защитой от осложнений и экспорт клинического отчёта для врача.",
+    caseFlow: {
+      was: "Пациенты забывают упражнения, занимаются через острую боль, а у врача нет объективной картины восстановления.",
+      result: "100% безопасный трекинг без риска рецидива: автоблокировка тренировок при боли 7+ и детекция красных флагов.",
+      became: "Автономное клиническое SPA без сбора персональных данных на сервере, готовое к экспорту в PDF и интеграции с Supabase."
+    },
+    tags: ["React 18", "Recharts", "Vite Singlefile", "Web Audio API", "Детектор Red Flags", "Отчёт врачу PDF", "MedTech"],
+    stats: [
+      { label: "Стек", value: "React 18 + Recharts" },
+      { label: "Безопасность", value: "Red Flags детектор" },
+      { label: "Клиника", value: "Экспорт в PDF" }
+    ],
+    linkText: "Открыть Ainala Rehab ↗",
+    link: "https://228burger228.github.io/med/",
+    secondaryLinkText: "Репозиторий GitHub ↗",
+    secondaryLink: "https://github.com/228burger228/med",
+    image: "./assets/ainala.jpg",
+    gallery: [
+      { src: "./assets/ainala.jpg", caption: "Ainala Rehab — Цифровая платформа безопасной реабилитации (MedTech SPA)" }
+    ]
   }
 ];
 

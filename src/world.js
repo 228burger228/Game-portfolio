@@ -412,7 +412,8 @@ export class World {
     const connections = [
       [0, 1], [0, 2], [0, 3], [0, 4], [0, 5], [0, 6],
       [1, 6], [2, 6], [2, 3], [3, 5],
-      [4, 7], [5, 8], [7, 9], [8, 9], [0, 9]
+      [4, 7], [5, 8], [7, 9], [8, 9], [0, 9],
+      [1, 10], [4, 10], [2, 11]
     ];
 
     connections.forEach(([i, j]) => {
@@ -1037,6 +1038,87 @@ export class World {
         this.animatedLandmarks.push((dt, t) => {
           planeGroup.position.y = 4.2 + Math.sin(t * 2.5) * 0.4;
           planeGroup.rotation.y = Math.sin(t * 1.2) * 0.35;
+        });
+        break;
+      }
+
+      case 'europath': {
+        // EuroPath: European Academic Arch + Golden Armillary Celestial Sphere
+        [-1.9, 1.9].forEach((cx) => {
+          const col = new THREE.Mesh(new THREE.CylinderGeometry(0.45, 0.52, 5.4, 12), whiteMat);
+          col.position.set(cx, 2.7, 0);
+          col.castShadow = true;
+          landmarkGroup.add(col);
+        });
+
+        const archTop = new THREE.Mesh(new THREE.BoxGeometry(4.8, 0.8, 1.4), whiteMat);
+        archTop.position.set(0, 5.6, 0);
+        archTop.castShadow = true;
+        landmarkGroup.add(archTop);
+
+        const pediment = new THREE.Mesh(new THREE.ConeGeometry(2.6, 1.2, 4), whiteMat);
+        pediment.rotation.y = Math.PI / 4;
+        pediment.position.set(0, 6.4, 0);
+        pediment.castShadow = true;
+        landmarkGroup.add(pediment);
+
+        const globeGroup = new THREE.Group();
+        globeGroup.position.set(0, 2.8, 0);
+
+        const goldMat = new THREE.MeshStandardMaterial({ color: 0xd3bc8e, metalness: 0.6, roughness: 0.3 });
+        const sphereCore = new THREE.Mesh(new THREE.SphereGeometry(0.7, 12, 10), accentMat);
+        globeGroup.add(sphereCore);
+
+        const armRing1 = new THREE.Mesh(new THREE.TorusGeometry(1.2, 0.08, 8, 24), goldMat);
+        globeGroup.add(armRing1);
+
+        const armRing2 = new THREE.Mesh(new THREE.TorusGeometry(1.4, 0.08, 8, 24), goldMat);
+        armRing2.rotation.x = Math.PI / 3;
+        globeGroup.add(armRing2);
+
+        landmarkGroup.add(globeGroup);
+        this.animatedLandmarks.push((dt) => {
+          globeGroup.rotation.y += dt * 1.4;
+          globeGroup.rotation.x += dt * 0.7;
+        });
+        break;
+      }
+
+      case 'rehab': {
+        // Ainala Rehab: Medical Clinic Pod + Glowing Heart Pulse Wave & Joint Kinematics Ring
+        const podBase = new THREE.Mesh(new THREE.CylinderGeometry(2.2, 2.7, 1.4, 10), darkMat);
+        podBase.position.y = 0.7;
+        podBase.castShadow = true;
+        landmarkGroup.add(podBase);
+
+        const crossMat = new THREE.MeshBasicMaterial({ color: 0x5ee6d0 });
+        const crossV = new THREE.Mesh(new THREE.BoxGeometry(0.5, 1.6, 0.15), crossMat);
+        crossV.position.set(0, 0.8, 2.5);
+        landmarkGroup.add(crossV);
+        const crossH = new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.5, 0.15), crossMat);
+        crossH.position.set(0, 0.8, 2.5);
+        landmarkGroup.add(crossH);
+
+        const rehabGroup = new THREE.Group();
+        rehabGroup.position.set(0, 3.8, 0);
+
+        const jointRing = new THREE.Mesh(
+          new THREE.TorusGeometry(2.0, 0.16, 12, 32, Math.PI * 1.5),
+          new THREE.MeshStandardMaterial({ color: 0x0b8a8f, metalness: 0.4, roughness: 0.3 })
+        );
+        rehabGroup.add(jointRing);
+
+        const pulseCore = new THREE.Mesh(
+          new THREE.OctahedronGeometry(0.9, 0),
+          new THREE.MeshBasicMaterial({ color: 0x5ee6d0 })
+        );
+        rehabGroup.add(pulseCore);
+
+        landmarkGroup.add(rehabGroup);
+        this.animatedLandmarks.push((dt, t) => {
+          jointRing.rotation.z = Math.sin(t * 1.8) * 0.9;
+          pulseCore.scale.setScalar(1.0 + Math.sin(t * 4.5) * 0.22);
+          pulseCore.rotation.y += dt * 2.0;
         });
         break;
       }
