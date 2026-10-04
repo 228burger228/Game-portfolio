@@ -309,6 +309,10 @@ export const HELIPADS = [
     link: "https://228burger228.github.io/foodiCE/",
     secondaryLinkText: "Открыть Digital Garden ↗",
     secondaryLink: "https://228burger228.github.io/digital-garden",
+    extraLinks: [
+      { text: "💼 Визитка Dimutri & Burger ↗", url: "https://228burger228.github.io/portfelDD/" },
+      { text: "🤖 Студийный бот @dmitryB_studio_bot", url: "https://t.me/dmitryB_studio_bot" }
+    ],
     image: "./assets/foodiCE.png",
     gallery: [
       { src: "./assets/foodiCE.png", caption: "foodiCE — Промо-лендинг крафтового мороженого" },
